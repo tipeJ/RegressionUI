@@ -19,6 +19,16 @@ class DatasetLoaderTest extends AnyFlatSpec with Matchers{
                           | 6.0: 5.7
                           |9: 12
                           |""".stripMargin drop 1),
+    "JSONDataFile" -> ("""
+              {
+                "data": {
+                  "1.2523": 6543.4234,
+                  "0.00005": 132.342
+                },
+                "keysLabel": "Keys",
+                "valuesLabel": "Values"
+              }
+    """.stripMargin drop 1),
   )
 
   "DatasetLoader.loadStandardFile" should "be able to load a correctly formatted file" in {
@@ -30,6 +40,18 @@ class DatasetLoaderTest extends AnyFlatSpec with Matchers{
     withClue("Loading data failed:") {
       dataSet.data.size should equal (5)
     }
+  }
 
+  "DatasetLoader.loadJSONFile" should "be able to load a correctly formatted file" in {
+    // Run the code we want to test. NOTE that you usually shouldn't try to
+    // catch exceptions in tests, because we want the test to fail in that case
+    val testInput: Reader = new StringReader(dataFiles("JSONDataFile"))
+    val dataSet = DatasetLoader.loadJSONFile(testInput)
+
+    withClue("Loading data failed:") {
+      dataSet.data.size should equal (2)
+      dataSet.keysLabel should equal ("Keys")
+      dataSet.valuesLabel should equal ("Values")
+    }
   }
 }

@@ -7,6 +7,7 @@ scalaVersion := "2.13.4"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
+libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.7.0-M10"
 
 libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
 lazy val osName = System.getProperty("os.name") match {
