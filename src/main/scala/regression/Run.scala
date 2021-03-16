@@ -1,5 +1,7 @@
 package regression
 
-object Run extends App {
+import scalafx.application.JFXApp
+
+object Run extends JFXApp {
 
 }
