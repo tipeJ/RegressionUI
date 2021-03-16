@@ -26,3 +26,4 @@ target/
 .bloop/
 .bsp/
 .metals/
+.vscode/
