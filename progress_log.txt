@@ -1,0 +1,14 @@
+# Interim report 1 (17.3)
+
+Added functionality:
+ - Dataset, Sheet classes
+ - Basic UI placeholder
+ - Fileloader implementation, for both the standard file format and the JSON format (as described in the project plan)
+
+The application can be ran, and Fileloader class has unit tests in the tests folder (DatasetLoaderTest) for both of the data formats. The simple placeholder UI works as can be expected.
+
+No difficult errors have occurred. I noticed that you can't use integers as keys in JSON, so I had to slightly change the planned JSON format to accommodate this limitation.
+
+Workload: About 10-12 hours.
+
+I am roughly following the schedule I set for myself in the project plan, maybe slightly ahead as I hadn't planned to start the UI development part yet.
