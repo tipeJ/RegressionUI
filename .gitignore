@@ -24,4 +24,5 @@ target/
 .scala_dependencies
 .worksheet
 .bloop/
+.bsp/
 .metals/
