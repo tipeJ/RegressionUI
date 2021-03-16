@@ -9,7 +9,9 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.7.0-M10"
 
+// ScalaFX library
 libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
+// Determine OS version of JavaFX binaries
 lazy val osName = System.getProperty("os.name") match {
   case n if n.startsWith("Linux")   => "linux"
   case n if n.startsWith("Mac")     => "mac"
