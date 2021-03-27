@@ -13,10 +13,25 @@ import scalafx.scene.layout.BackgroundFill
 import scalafx.scene.paint.Color
 import scalafx.scene.layout.CornerRadii
 import scalafx.geometry.Insets
-import scalafx.scene.control.Label
+import scalafx.scene.control._
+import scalafx.collections._
+import scalafx.scene.control.TableColumn._
+import scalafx.beans.property.DoubleProperty
+import scalafx.beans.property.ObjectProperty
+import scalafx.beans.property.ReadOnlyDoubleWrapper
+import scalafx.beans.value.ObservableValue
 
+class DataCell(key_ : Double, value_ : Double) {
+  val k = new ObjectProperty[Double](this, "k", key_)
+  val v = new ObjectProperty[Double](this, "v", value_)
+}
 object Run extends JFXApp {
 
+  lazy val obs = ObservableBuffer(
+    new DataCell(1.2, 5.6),
+    new DataCell(1.6, 128.2),
+    new DataCell(2.0, 129.2)
+  )
   stage = new JFXApp.PrimaryStage {
     title.value = "Regression UI"
     width = 750
@@ -29,9 +44,20 @@ object Run extends JFXApp {
   // Placeholders
   val menubarPH     = new HBox
   val tabbarPH      = new HBox
-  val sidebarPH     = new VBox
+  val sidebarPH     = new TableView[DataCell]()
   val coordinatesPH = new Canvas(600, 600)
 
+  sidebarPH.setItems(obs)
+  val keyColumn = new TableColumn[DataCell, String]{
+    text = "Key"
+    cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.k.value).asInstanceOf[ObservableValue[String, String]]
+  }
+  val valueColumn = new TableColumn[DataCell, String]{
+    text = "Value"
+    cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.v.value).asInstanceOf[ObservableValue[String, String]]
+  }
+  sidebarPH.columns.addAll(keyColumn, valueColumn)
+  sidebarPH.columnResizePolicy = TableView.ConstrainedResizePolicy
   val menubarPHLabel = new Label("Menubar")
   val tabbarPHLabel = new Label("Tabbar")
   val sidebarPHLabel = new Label("sidebar")
@@ -39,7 +65,6 @@ object Run extends JFXApp {
   menubarPH              .children_=(menubarPHLabel)
   tabbarPH               .children_=(tabbarPHLabel)
   coordinatesPH          .graphicsContext2D.fillText("Coordinates", 10, 100)
-  sidebarPH              .children_=(sidebarPHLabel)
 
   root.add(menubarPH,        0, 0, 2, 1)
   root.add(tabbarPH,         0, 1, 2, 1)
@@ -66,4 +91,5 @@ object Run extends JFXApp {
   tabbarPH.setBackground(new Background(Array(new BackgroundFill(Color.Beige, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
   menubarPH.setBackground(new Background(Array(new BackgroundFill(Color.Cyan, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
   sidebarPH.setBackground(new Background(Array(new BackgroundFill(Color.Gray, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
+
 }
