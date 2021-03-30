@@ -1,3 +1,18 @@
+# Interim report 2 (31.3)
+
+Added functionality:
+ - File loading and data parsing from .txt and .json formats (still work to be done here, especially in testing)
+ - All placeholders (Except for the coordinates) replaced by actual UI components
+
+The application can now be ran, and there will be a button for loading correctly formatted table data. An error message will be displayed if the file is incorrectly formatted or can't be opened. The currently opened sheets can be seen via the tab panel, and the current data set can be inspected via the data panel on the left, which will also display the axis labels. The menubar class has currently only the file loader button, but more features will be added later as needed for the coordinator UI part, which will be implemented next.
+
+I encountered some difficulties splitting the UI to multiple explicit scala files instead of having everything in the main Application class, but I think that I managed to do reasonably well, while preserving the possibility of extending the project in the future. The main application UI structure is still somewhat unfinished, and not all functions there will be present in the final submission.
+
+Workload: About 7 hours
+I am currently closely following the schedule I had set in the Project Plan. Next up is implementing the coordinates view with the different regression displays.
+
+I saw that you had added a note to my Project Plan where you said that I was aiming for the intermediate level, but I am currently targeting the advanced difficulty. Just hoped to clear that up :).
+
 # Interim report 1 (17.3)
 
 Added functionality:
