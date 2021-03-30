@@ -1,17 +1,10 @@
 package regression
 
 import scalafx.application.JFXApp
-import scalafx.scene.layout.VBox
-import scalafx.scene.layout.ColumnConstraints
-import scalafx.scene.layout.RowConstraints
-import scalafx.scene.layout.Background
-import scalafx.scene.layout.GridPane
+import scalafx.scene.layout._
 import scalafx.scene.Scene
-import scalafx.scene.layout.HBox
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.layout.BackgroundFill
 import scalafx.scene.paint.Color
-import scalafx.scene.layout.CornerRadii
 import scalafx.geometry.Insets
 import scalafx.scene.control._
 import scalafx.collections._
@@ -20,6 +13,13 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.beans.property.ObjectProperty
 import scalafx.beans.property.ReadOnlyDoubleWrapper
 import scalafx.beans.value.ObservableValue
+import scalafx.stage.FileChooser
+import regression.ui._
+import java.io.{File, InputStreamReader, FileInputStream, BufferedReader}
+import regression.io.DatasetLoader
+import regression.io.CorruptedDatasetException
+import regression.models.Sheet
+import scala.collection.mutable.Buffer
 
 class DataCell(key_ : Double, value_ : Double) {
   val k = new ObjectProperty[Double](this, "k", key_)
@@ -41,34 +41,74 @@ object Run extends JFXApp {
   val scene = new Scene(root)
   stage.scene = scene
 
+
   // Placeholders
-  val menubarPH     = new HBox
-  val tabbarPH      = new HBox
-  val sidebarPH     = new TableView[DataCell]()
+  // val menubarPH     = new HBox
+  val menuB         = new ReMbar(stage, loadDataFile)
+  val tabbar        = new ReTabBar(removeSheet, selectSheet)
+  val datapanel     = new ReDataPanel
   val coordinatesPH = new Canvas(600, 600)
 
-  sidebarPH.setItems(obs)
-  val keyColumn = new TableColumn[DataCell, String]{
-    text = "Key"
-    cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.k.value).asInstanceOf[ObservableValue[String, String]]
+  var sheets = Buffer[Sheet]()
+  var currentSheet = -1
+  /// Adds the sheet to the currently open sheets in memory
+  def addSheet(sheet: Sheet) = {
+    sheets.addOne(sheet)
+    currentSheet = sheets.length - 1
+    tabbar.refresh(sheets.toSeq)
+    datapanel.refresh(sheets(currentSheet))
   }
-  val valueColumn = new TableColumn[DataCell, String]{
-    text = "Value"
-    cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.v.value).asInstanceOf[ObservableValue[String, String]]
+  def selectSheet(index: Int) = {
+    currentSheet = index
+    datapanel.refresh(sheets(currentSheet))
   }
-  sidebarPH.columns.addAll(keyColumn, valueColumn)
-  sidebarPH.columnResizePolicy = TableView.ConstrainedResizePolicy
-  val menubarPHLabel = new Label("Menubar")
-  val tabbarPHLabel = new Label("Tabbar")
-  val sidebarPHLabel = new Label("sidebar")
-
-  menubarPH              .children_=(menubarPHLabel)
-  tabbarPH               .children_=(tabbarPHLabel)
+  def removeSheet(index: Int) = {
+    sheets.remove(index)
+    if (currentSheet == index) {
+      currentSheet = currentSheet match {
+        case 0 => sheets.length - 1
+        case _ => currentSheet - 1
+      }
+    }
+    datapanel.refresh(sheets(currentSheet))
+  }
+  /// Loads a sheet from a file
+  def loadDataFile(f: File) = {
+    def showError(message: String) {
+      val alert = new Alert(Alert.AlertType.Error)
+      alert.setContentText(message)
+      alert.show()
+    }
+    if (f != null && f.canRead()) {
+      try {
+        val reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)))
+        // Gets the extension type
+        val ext = f.getName().substring(f.getName().lastIndexOf('.')+1).toLowerCase()
+        val data = ext match {
+          case "json" => DatasetLoader.loadJSONFile(reader)
+          case "txt"  => DatasetLoader.loadStandardFile(reader)
+        }
+        val nameDialog = new TextInputDialog
+        nameDialog.setContentText("Sheet name")
+        val nameResult = nameDialog.showAndWait()
+        nameResult match {
+          case Some("")   => addSheet(new Sheet(f.getName(), data))
+          case Some(name) => addSheet(new Sheet(name, data))
+          case None       => addSheet(new Sheet(s"Sheet ${(sheets.length + 1).toString}", data))
+        }
+      } catch {
+        case dsE : CorruptedDatasetException => showError("Error loading dataset")
+        case e   : Exception => showError("Error loading file: " + e.getMessage())
+      }
+    }
+  }
+  menuB.refresh()
+  tabbar.refresh(Seq())
   coordinatesPH          .graphicsContext2D.fillText("Coordinates", 10, 100)
 
-  root.add(menubarPH,        0, 0, 2, 1)
-  root.add(tabbarPH,         0, 1, 2, 1)
-  root.add(sidebarPH,        0, 2, 1, 1)
+  root.add(menuB.node,        0, 0, 2, 1)
+  root.add(new HBox(tabbar.tabpanel),         0, 1, 2, 1)
+  root.add(datapanel.table,        0, 2, 1, 1)
   root.add(coordinatesPH,    1, 2, 1, 1)
 
   val column0 = new ColumnConstraints
@@ -81,15 +121,17 @@ object Run extends JFXApp {
   val row1 = new RowConstraints
   val row2 = new RowConstraints
 
-  row0.setPercentHeight(5.0)
-  row1.setPercentHeight(5.0)
-  row2.setPercentHeight(90.0)
+  row0.setMinHeight(30.0)
+  row0.setMaxHeight(30.0)
+  row1.setMinHeight(35.0)
+  row1.setMaxHeight(35.0)
+  row2.setMinHeight(250.0)
 
   root.columnConstraints = Array[ColumnConstraints](column0, column1)
   root.rowConstraints    = Array[RowConstraints](row0, row1, row2)
 
-  tabbarPH.setBackground(new Background(Array(new BackgroundFill(Color.Beige, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
-  menubarPH.setBackground(new Background(Array(new BackgroundFill(Color.Cyan, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
-  sidebarPH.setBackground(new Background(Array(new BackgroundFill(Color.Gray, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
+  // tabbarPH.setBackground(new Background(Array(new BackgroundFill(Color.Beige, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
+  menuB.node.setBackground(new Background(Array(new BackgroundFill(Color.Cyan, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
+  datapanel.table.setBackground(new Background(Array(new BackgroundFill(Color.Gray, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
 
 }
