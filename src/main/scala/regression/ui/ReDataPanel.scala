@@ -16,17 +16,23 @@ class ReDataPanel() {
 
   table.columnResizePolicy = TableView.ConstrainedResizePolicy
 
-  def refresh(sheet: Sheet) = {
+  def refresh(sheet: Option[Sheet]) = {
     val obs = ObservableBuffer[DataCell]()
-    sheet.dataset.data.toList.foreach(t => obs.addOne(new DataCell(t._1, t._2)))
+    var keysLabel = "X"
+    var valuesLabel = "Y"
+    if (sheet.nonEmpty) {
+      sheet.get.dataset.data.toList.foreach(t => obs.addOne(new DataCell(t._1, t._2)))
+      keysLabel = sheet.get.dataset.keysLabel
+      valuesLabel = sheet.get.dataset.valuesLabel
+    }
     val keyColumn = new TableColumn[DataCell, String]{
-        text = sheet.dataset.keysLabel
-        cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.k.value).asInstanceOf[ObservableValue[String, String]]
-      }
-      val valueColumn = new TableColumn[DataCell, String]{
-        text = sheet.dataset.valuesLabel
-        cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.v.value).asInstanceOf[ObservableValue[String, String]]
-      }
+      text = keysLabel
+      cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.k.value).asInstanceOf[ObservableValue[String, String]]
+    }
+    val valueColumn = new TableColumn[DataCell, String]{
+      text = valuesLabel
+      cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.v.value).asInstanceOf[ObservableValue[String, String]]
+    }
     table.columns.setAll(keyColumn, valueColumn)
     table.setItems(obs)
   }

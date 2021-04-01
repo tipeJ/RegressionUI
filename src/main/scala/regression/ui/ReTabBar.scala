@@ -8,16 +8,14 @@ class ReTabBar(onClosed: (Int) => Unit, onSelected: (Int) => Unit) {
 
   def refresh(sheets: Seq[Sheet]) = {
     tabpanel.getTabs().setAll()
-    for (i <- sheets.indices) {
-      val s = sheets(i)
+    for (s <- sheets) {
       val tab = new Tab
       tab.text = s.name
       tab.onClosed = (event) => {
-        this.onClosed(i)
-        tabpanel.getTabs().remove(i)
+        this.onClosed(s.id)
       }
       tab.onSelectionChanged = (event) => {
-        if (tab.isSelected()) onSelected(i)
+        if (tab.isSelected()) onSelected(s.id)
       }
       tabpanel.getTabs().add(tab)
     }

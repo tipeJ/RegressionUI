@@ -47,65 +47,33 @@ object Run extends JFXApp {
 
   var sheets = Buffer[Sheet]()
   var currentSheet = -1
+  def getSheet(id: Int) : Option[Sheet] = sheets.filter(_.id == id).lift(0)
   /// Adds the sheet to the currently open sheets in memory
   def addSheet(sheet: Sheet) = {
     sheets.addOne(sheet)
-    currentSheet = sheets.length - 1
+    currentSheet = sheet.id
     tabbar.refresh(sheets.toSeq)
-    datapanel.refresh(sheets(currentSheet))
+    datapanel.refresh(Some(sheet))
   }
-  def selectSheet(index: Int) = {
-    currentSheet = index
-    datapanel.refresh(sheets(currentSheet))
+  def selectSheet(id: Int) = {
+    currentSheet = id
+    datapanel.refresh(getSheet(currentSheet))
   }
-  def removeSheet(index: Int) = {
-    sheets.remove(index)
-    if (currentSheet == index) {
-      currentSheet = currentSheet match {
-        case 0 => sheets.length - 1
-        case _ => currentSheet - 1
-      }
-    }
-    datapanel.refresh(sheets(currentSheet))
-  }
-  /// Loads a sheet from a file
-  def loadDataFile(f: File) = {
-    def showError(message: String) {
-      val alert = new Alert(Alert.AlertType.Error)
-      alert.setContentText(message)
-      alert.show()
-    }
-    if (f != null && f.canRead()) {
-      try {
-        val reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)))
-        // Gets the extension type
-        val ext = f.getName().substring(f.getName().lastIndexOf('.')+1).toLowerCase()
-        val data = ext match {
-          case "json" => DatasetLoader.loadJSONFile(reader)
-          case "txt"  => DatasetLoader.loadStandardFile(reader)
-        }
-        val nameDialog = new TextInputDialog
-        nameDialog.setContentText("Sheet name")
-        val nameResult = nameDialog.showAndWait()
-        nameResult match {
-          case Some("")   => addSheet(new Sheet(f.getName(), data))
-          case Some(name) => addSheet(new Sheet(name, data))
-          case None       => addSheet(new Sheet(s"Sheet ${(sheets.length + 1).toString}", data))
-        }
-      } catch {
-        case dsE : CorruptedDatasetException => showError("Error loading dataset")
-        case e   : Exception => showError("Error loading file: " + e.getMessage())
-      }
+  def removeSheet(id: Int) = {
+    sheets.remove(sheets.indexWhere(_.id == id))
+    if (currentSheet == id) {
+      val newId = if (sheets.nonEmpty) sheets(0).id else -1
+      selectSheet(newId)
     }
   }
   menuB.refresh()
   tabbar.refresh(Seq())
   coordinatesPH          .graphicsContext2D.fillText("Coordinates", 10, 100)
 
-  root.add(menuB.node,        0, 0, 2, 1)
+  root.add(menuB.node,                        0, 0, 2, 1)
   root.add(new HBox(tabbar.tabpanel),         0, 1, 2, 1)
-  root.add(datapanel.table,        0, 2, 1, 1)
-  root.add(coordinatesPH,    1, 2, 1, 1)
+  root.add(datapanel.table,                   0, 2, 1, 1)
+  root.add(coordinatesPH,                     1, 2, 1, 1)
 
   val column0 = new ColumnConstraints
   val column1 = new ColumnConstraints
@@ -130,4 +98,38 @@ object Run extends JFXApp {
   menuB.node.setBackground(new Background(Array(new BackgroundFill(Color.Cyan, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
   datapanel.table.setBackground(new Background(Array(new BackgroundFill(Color.Gray, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
 
+  // Initialize the first sheet id
+  var newId = 0
+  /// Loads a sheet from a file
+  def loadDataFile(f: File) = {
+    def showError(message: String) {
+      val alert = new Alert(Alert.AlertType.Error)
+      alert.setContentText(message)
+      alert.show()
+    }
+    if (f != null && f.canRead()) {
+      try {
+        val reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)))
+        // Gets the extension type
+        val ext = f.getName().substring(f.getName().lastIndexOf('.')+1).toLowerCase()
+        val data = ext match {
+          case "json" => DatasetLoader.loadJSONFile(reader)
+          case "txt"  => DatasetLoader.loadStandardFile(reader)
+        }
+        val nameDialog = new TextInputDialog
+        nameDialog.setContentText("Sheet name")
+        val nameResult = nameDialog.showAndWait()
+        val name = nameResult match {
+          case Some("")   => f.getName()
+          case Some(name) => name
+          case None       => s"Sheet ${(sheets.length + 1).toString}"
+        }
+        addSheet(new Sheet(name, newId, data))
+        newId = newId + 1
+      } catch {
+        case dsE : CorruptedDatasetException => showError("Error loading dataset")
+        case e   : Exception => showError("Error loading file: " + e.getMessage())
+      }
+    }
+  }
 }
