@@ -21,10 +21,6 @@ import regression.io.CorruptedDatasetException
 import regression.models.Sheet
 import scala.collection.mutable.Buffer
 
-class DataCell(key_ : Double, value_ : Double) {
-  val k = new ObjectProperty[Double](this, "k", key_)
-  val v = new ObjectProperty[Double](this, "v", value_)
-}
 object Run extends JFXApp {
 
   lazy val obs = ObservableBuffer(
