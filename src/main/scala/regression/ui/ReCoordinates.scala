@@ -26,6 +26,7 @@ class ReCoordinates extends Pane{
       series.getData().add(chartPoint)
     }
     val xMax = set.data.keys.max
+    val drawStep = xMax / 125 // Step between two data dots
     var currentX = 0.0
     while (currentX <= xMax) {
       val y = fit.polynomialValue(currentX)
@@ -34,7 +35,7 @@ class ReCoordinates extends Pane{
       pointNode.setFill(fit.color)
       chartPoint.setNode(new Rectangle(2.0, 2.0))
       series.getData().add(chartPoint)
-      currentX += 0.03
+      currentX += drawStep
     }
 
   }
