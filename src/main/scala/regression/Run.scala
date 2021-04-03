@@ -20,14 +20,11 @@ import regression.io.DatasetLoader
 import regression.io.CorruptedDatasetException
 import regression.models.Sheet
 import scala.collection.mutable.Buffer
+import regression.io.Dataset
+import regression.io.LinearFit
 
 object Run extends JFXApp {
 
-  lazy val obs = ObservableBuffer(
-    new DataCell(1.2, 5.6),
-    new DataCell(1.6, 128.2),
-    new DataCell(2.0, 129.2)
-  )
   stage = new JFXApp.PrimaryStage {
     title.value = "Regression UI"
     width = 750
@@ -38,15 +35,20 @@ object Run extends JFXApp {
   stage.scene = scene
 
 
-  // Placeholders
   // val menubarPH     = new HBox
   val menuB         = new ReMbar(stage, loadDataFile)
   val tabbar        = new ReTabBar(removeSheet, selectSheet)
   val datapanel     = new ReDataPanel
-  val coordinatesPH = new Canvas(600, 600)
+  val coordinates   = new ReCoordinates
 
+  val testSheet = new Sheet("yestsheet", 0, new Dataset(Map[Double, Double](
+                                          2.1 -> 5.7,
+                                          5.1 -> 13.9,
+                                          7.88 -> 17.6,
+                                          10.0 -> 20.96
+                                        ), "XAX", "YAX"))
   var sheets = Buffer[Sheet]()
-  var currentSheet = -1
+  var currentSheet = 0
   def getSheet(id: Int) : Option[Sheet] = sheets.filter(_.id == id).lift(0)
   /// Adds the sheet to the currently open sheets in memory
   def addSheet(sheet: Sheet) = {
@@ -58,6 +60,7 @@ object Run extends JFXApp {
   def selectSheet(id: Int) = {
     currentSheet = id
     datapanel.refresh(getSheet(currentSheet))
+    refreshCoordinates()
   }
   def removeSheet(id: Int) = {
     sheets.remove(sheets.indexWhere(_.id == id))
@@ -66,14 +69,17 @@ object Run extends JFXApp {
       selectSheet(newId)
     }
   }
+  def refreshCoordinates() {
+    val sheetOption = getSheet(currentSheet)
+    sheetOption match {
+      case Some(sheet) => coordinates.refresh(sheet.dataset, new LinearFit(sheet.dataset.data.toList))
+      case None => println("TODO: Add empty data disclaimer")
+    }
+  }
   menuB.refresh()
   tabbar.refresh(Seq())
-  coordinatesPH          .graphicsContext2D.fillText("Coordinates", 10, 100)
+  refreshCoordinates()
 
-  root.add(menuB.node,                        0, 0, 2, 1)
-  root.add(new HBox(tabbar.tabpanel),         0, 1, 2, 1)
-  root.add(datapanel.table,                   0, 2, 1, 1)
-  root.add(coordinatesPH,                     1, 2, 1, 1)
 
   val column0 = new ColumnConstraints
   val column1 = new ColumnConstraints
@@ -93,6 +99,11 @@ object Run extends JFXApp {
 
   root.columnConstraints = Array[ColumnConstraints](column0, column1)
   root.rowConstraints    = Array[RowConstraints](row0, row1, row2)
+
+  root.add(menuB.node,                        0, 0, 2, 1)
+  root.add(new VBox(tabbar.tabpanel),         0, 1, 2, 1)
+  root.add(datapanel.table,                   0, 2, 1, 1)
+  root.add(coordinates.chart,                     1, 2, 1, 1)
 
   // tabbarPH.setBackground(new Background(Array(new BackgroundFill(Color.Beige, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
   menuB.node.setBackground(new Background(Array(new BackgroundFill(Color.Cyan, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
