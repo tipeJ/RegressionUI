@@ -27,7 +27,7 @@ class ReCoordinates extends Pane{
     }
     val xMax = set.data.keys.max
     val drawStep = xMax / 125 // Step between two data dots
-    var currentX = 0.0
+    var currentX = math.min(0.0, set.data.keys.min)
     while (currentX <= xMax) {
       val y = fit.polynomialValue(currentX)
       val chartPoint = new XYChart.Data[Number, Number](new javafx.scene.chart.XYChart.Data(currentX, y))
