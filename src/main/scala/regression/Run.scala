@@ -22,6 +22,7 @@ import regression.models.Sheet
 import scala.collection.mutable.Buffer
 import regression.io.Dataset
 import regression.io.LinearFit
+import regression.io.QuadraticFit
 
 object Run extends JFXApp {
 
@@ -73,7 +74,7 @@ object Run extends JFXApp {
     val sheetOption = getSheet(currentSheet)
     sheetOption match {
       case Some(sheet) => {
-        val newFit = new LinearFit(sheet.dataset.data.toList)
+        val newFit = new QuadraticFit(sheet.dataset.data.toList)
         coordinates.refresh(sheet.dataset, newFit)
         menuB.refresh(Some(newFit))
       }
@@ -119,6 +120,7 @@ object Run extends JFXApp {
   def loadDataFile(f: File) = {
     def showError(message: String) {
       val alert = new Alert(Alert.AlertType.Error)
+      alert.title_=("Error")
       alert.setContentText(message)
       alert.show()
     }

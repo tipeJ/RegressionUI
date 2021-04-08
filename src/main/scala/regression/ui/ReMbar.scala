@@ -29,7 +29,17 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
     val fitComboBox = new ComboBox[String]
     fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")
     fitComboBox.value.value_=(fitValue)
-    val nSeq = Seq[Node](loadDataButton, fitComboBox)
+
+    val fitInfoButton = new Button("Show equation")
+    if (fit.nonEmpty) {
+      fitInfoButton.onAction = (event) => {
+        val alert = new Alert(Alert.AlertType.Information)
+        alert.title_=("Equation")
+        alert.setContentText(fit.get.formattedExpression)
+        alert.show()
+      }
+    }
+    val nSeq = Seq[Node](loadDataButton, fitComboBox, fitInfoButton)
     node.children_=(nSeq)
   }
 }
