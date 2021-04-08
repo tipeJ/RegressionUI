@@ -16,10 +16,8 @@ class ReCoordinates extends Pane{
 
   def refresh(set: Dataset, fit: RegressionFit) {
     val series = new XYChart.Series[Number, Number]()
-    val seriesY = new XYChart.Series[Number, Number]()
+    val trendline = new XYChart.Series[Number, Number]()
 
-    chart.data.get().setAll(series, seriesY)
-    series.getNode().setStyle("-fx-stroke: transparent;")
 
     for (point <- set.data) {
       val chartPoint = new XYChart.Data[Number, Number](new javafx.scene.chart.XYChart.Data(point._1, point._2))
@@ -29,14 +27,19 @@ class ReCoordinates extends Pane{
     val drawStep = xMax / 125 // Step between two data dots
     var currentX = math.min(0.0, set.data.keys.min)
     while (currentX <= xMax) {
-      val y = fit.polynomialValue(currentX)
+      val y = fit.polynomialValue(currentX) // Calculate the Y-value of the given polynomial
       val chartPoint = new XYChart.Data[Number, Number](new javafx.scene.chart.XYChart.Data(currentX, y))
-      val pointNode = new Rectangle(2.0, 2.0)
-      pointNode.setFill(fit.color)
-      chartPoint.setNode(new Rectangle(2.0, 2.0))
-      series.getData().add(chartPoint)
+      val pointNode = new Rectangle(0.0, 0.0)
+      chartPoint.setNode(pointNode)
+      trendline.getData().add(chartPoint)
       currentX += drawStep
     }
+    chart.data.get().setAll(series, trendline)
 
+    series.getNode().lookup(".chart-series-line").setStyle("-fx-stroke: transparent;") // Hide data points line that is visible by default
+
+    // Set the trendline color accordingly
+    val (r, g, b) = (fit.color.red * 255, fit.color.green * 255, fit.color.blue * 255)
+    trendline.getNode().lookup(".chart-series-line").setStyle(s"-fx-stroke: rgba($r, $g, $b, 1.0);")
   }
 }
