@@ -72,11 +72,15 @@ object Run extends JFXApp {
   def refreshCoordinates() {
     val sheetOption = getSheet(currentSheet)
     sheetOption match {
-      case Some(sheet) => coordinates.refresh(sheet.dataset, new LinearFit(sheet.dataset.data.toList))
+      case Some(sheet) => {
+        val newFit = new LinearFit(sheet.dataset.data.toList)
+        coordinates.refresh(sheet.dataset, newFit)
+        menuB.refresh(Some(newFit))
+      }
       case None => println("TODO: Add empty data disclaimer")
     }
   }
-  menuB.refresh()
+  menuB.refresh(None)
   tabbar.refresh(Seq())
   refreshCoordinates()
 
