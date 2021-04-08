@@ -28,6 +28,9 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
     }
     val fitComboBox = new ComboBox[String]
     fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")
+    fitComboBox.onAction = (event) => {
+
+    }
     fitComboBox.value.value_=(fitValue)
 
     val fitInfoButton = new Button("Show equation")
