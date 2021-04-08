@@ -136,13 +136,14 @@ object Run extends JFXApp {
         val nameDialog = new TextInputDialog
         nameDialog.setContentText("Sheet name")
         val nameResult = nameDialog.showAndWait()
-        val name = nameResult match {
-          case Some("")   => f.getName()
-          case Some(name) => name
-          case None       => s"Sheet ${(sheets.length + 1).toString}"
+        nameResult match {
+          case Some(name) => {
+            val sheetName = if (name.isEmpty) s"Sheet ${(sheets.length + 1).toString}" else name
+            addSheet(new Sheet(name, newId, data))
+            newId = newId + 1
+          }
+          case None       =>
         }
-        addSheet(new Sheet(name, newId, data))
-        newId = newId + 1
       } catch {
         case dsE : CorruptedDatasetException => showError("Error loading dataset")
         case e   : Exception => showError("Error loading file: " + e.getMessage())
