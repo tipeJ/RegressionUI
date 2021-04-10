@@ -6,7 +6,7 @@ import regression.models.Sheet
 class ReTabBar(onClosed: (Int) => Unit, onSelected: (Int) => Unit) {
   val tabpanel = new TabPane
 
-  def refresh(sheets: Seq[Sheet]) = {
+  def refresh(sheets: Seq[Sheet], selectedIndex: Int) = {
     tabpanel.getTabs().setAll()
     for (s <- sheets) {
       val tab = new Tab
@@ -19,5 +19,6 @@ class ReTabBar(onClosed: (Int) => Unit, onSelected: (Int) => Unit) {
       }
       tabpanel.getTabs().add(tab)
     }
+    if (selectedIndex >= 0) tabpanel.selectionModel().select(selectedIndex)
   }
 }

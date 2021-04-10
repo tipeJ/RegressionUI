@@ -50,8 +50,8 @@ object Run extends JFXApp {
   /// Adds the sheet to the currently open sheets in memory
   def addSheet(sheet: Sheet) = {
     sheets.addOne(sheet)
-    tabbar.refresh(sheets.toSeq)
     selectSheet(sheet.id)
+    tabbar.refresh(sheets.toSeq, sheets.indexWhere(_.id == currentSheet))
   }
   def selectSheet(id: Int) = {
     currentSheet = id
@@ -88,7 +88,7 @@ object Run extends JFXApp {
     refreshCoordinates()
   }
   menuB.refresh(None)
-  tabbar.refresh(Seq())
+  tabbar.refresh(Seq(), -1)
   refreshCoordinates()
 
 
