@@ -28,6 +28,6 @@ class QuadraticFit(private val data : Seq[(Double, Double)], c: Color = Color.Al
 
   val (coef1, coef2, coef3) = quadraticFit()
   override def polynomialValue(x: Double): Double = (coef1 * x * x) + (coef2 * x) + coef3
-  override def formattedExpression: String = coef1 + s"x^2 ${coefFormat(coef2)}x ${coefFormat(coef2)}"
+  override def formattedExpression: String = coef1 + s"x^2 ${coefFormat(coef2)}x ${coefFormat(coef3)}"
 
 }
