@@ -2,4 +2,4 @@ package regression.models
 
 import regression.io.Dataset
 
-case class Sheet(name: String, id: Int, dataset: Dataset)
+class Sheet(var name: String, val id: Int, val dataset: Dataset, var fit: String)

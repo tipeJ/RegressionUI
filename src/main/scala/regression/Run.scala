@@ -42,7 +42,7 @@ object Run extends JFXApp {
                                           5.1 -> 13.9,
                                           7.88 -> 17.6,
                                           10.0 -> 20.96
-                                        ), "XAX", "YAX"))
+                                        ), "XAX", "YAX"), "Linear Fit")
   var sheets = Buffer[Sheet]()
   var currentSheet = 0
   var currentFit : Option[RegressionFit] = None
@@ -56,7 +56,7 @@ object Run extends JFXApp {
   def selectSheet(id: Int) = {
     currentSheet = id
     datapanel.refresh(getSheet(currentSheet))
-    refreshCoordinates()
+    updateFit(if (currentFit.nonEmpty) currentFit.get.color else Color.DarkBlue)
   }
   def removeSheet(id: Int) = {
     sheets.remove(sheets.indexWhere(_.id == id))
@@ -68,12 +68,21 @@ object Run extends JFXApp {
   def refreshCoordinates() = {
     coordinates.refresh(getSheet(currentSheet), currentFit)
   }
-  def switchFit(newFit: String) : Unit = {
+  def switchFit(newFit: String, color: Color) : Unit = {
+    getSheet(currentSheet) match {
+      case Some(sheet) => {
+        sheet.fit = newFit
+        updateFit(color)
+      }
+      case None =>
+    }
+  }
+  def updateFit(color: Color) : Unit = {
     currentFit = getSheet(currentSheet) match {
       case None => None
-      case Some(sheet) => newFit match {
-        case "Linear Fit" => Some(new LinearFit(sheet.dataset.data.toList))
-        case "Quadratic Fit" => Some(new QuadraticFit(sheet.dataset.data.toList))
+      case Some(sheet) => sheet.fit match {
+        case "Linear Fit" => Some(new LinearFit(sheet.dataset.data.toList, color))
+        case "Quadratic Fit" => Some(new QuadraticFit(sheet.dataset.data.toList, color))
         case _ => None
       }
     }
@@ -138,7 +147,7 @@ object Run extends JFXApp {
         nameResult match {
           case Some(name) => {
             val sheetName = if (name.isEmpty) s"Sheet ${(sheets.length + 1).toString}" else name
-            addSheet(new Sheet(name, newId, data))
+            addSheet(new Sheet(name, newId, data, "Linear Fit"))
             newId = newId + 1
           }
           case None       =>
