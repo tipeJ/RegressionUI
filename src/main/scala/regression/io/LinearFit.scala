@@ -2,7 +2,7 @@ package regression.io
 
 import scalafx.scene.paint.Color
 
-class LinearFit(private val data : Seq[(Double, Double)], c: Color = Color.AliceBlue) extends RegressionFit() {
+class LinearFit(private val data : Seq[(Double, Double)], c: Color = Color.AliceBlue) extends RegressionFit(c) {
 
   private def leastSquaresFit(data: Seq[(Double, Double)]) : (Double, Double) = {
     val n = data.length

@@ -2,7 +2,7 @@ package regression.io
 
 import scalafx.scene.paint.Color
 
-class QuadraticFit(private val data : Seq[(Double, Double)], c: Color = Color.AliceBlue) extends RegressionFit() {
+class QuadraticFit(private val data : Seq[(Double, Double)], c: Color = Color.AliceBlue) extends RegressionFit(c) {
 
   // private def avg[U](input: Iterable[Double]) = input.sum / input.size
 

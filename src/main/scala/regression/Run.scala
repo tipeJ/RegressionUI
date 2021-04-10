@@ -65,9 +65,7 @@ object Run extends JFXApp {
       selectSheet(newId)
     }
   }
-  def refreshCoordinates() = {
-    coordinates.refresh(getSheet(currentSheet), currentFit)
-  }
+  def refreshCoordinates() : Unit = coordinates.refresh(getSheet(currentSheet), currentFit)
   def switchFit(newFit: String, color: Color) : Unit = {
     getSheet(currentSheet) match {
       case Some(sheet) => {
