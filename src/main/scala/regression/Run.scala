@@ -107,6 +107,7 @@ object Run extends JFXApp {
   row1.setMinHeight(35.0)
   row1.setMaxHeight(35.0)
   row2.setMinHeight(250.0)
+  row2.setVgrow(Priority.ALWAYS)
 
   root.columnConstraints = Array[ColumnConstraints](column0, column1)
   root.rowConstraints    = Array[RowConstraints](row0, row1, row2)
