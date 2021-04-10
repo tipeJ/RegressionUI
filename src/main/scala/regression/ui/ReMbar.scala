@@ -24,7 +24,7 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
     val fitValue = fit match {
       case Some(fit: LinearFit)    => "Linear Fit"
       case Some(fit: QuadraticFit) => "Quadratic Fit"
-      case None                    => "No Fit"
+      case _                       => "No Fit"
     }
     val fitComboBox = new ComboBox[String]
     fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")

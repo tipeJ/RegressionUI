@@ -21,5 +21,5 @@ class LinearFit(private val data : Seq[(Double, Double)], c: Color = Color.Alice
 
   val (coef, yintercept) = leastSquaresFit(data)
   override def polynomialValue(x: Double): Double = coef * x + yintercept
-  override def formattedExpression: String = coef + s"x + $yintercept"
+  override def formattedExpression: String = coef + s"x ${coefFormat(yintercept)}"
 }
