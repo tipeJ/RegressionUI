@@ -12,7 +12,7 @@ class ReCoordinates extends Pane{
   val xAxis = new NumberAxis()
   val yAxis = new NumberAxis()
 
-  val chart = new LineChart(xAxis, yAxis)
+  var chart = new LineChart(xAxis, yAxis)
   chart.setLegendVisible(false)
 
   def refresh(sheet: Option[Sheet], fitOption: Option[RegressionFit]) {
@@ -21,6 +21,8 @@ class ReCoordinates extends Pane{
 
     if (sheet.nonEmpty) {
       val set = sheet.get.dataset
+      chart.XAxis.label_=(set.keysLabel)
+      chart.YAxis.label_=(set.valuesLabel)
 
       // Draw the data points
       for (point <- set.data) {

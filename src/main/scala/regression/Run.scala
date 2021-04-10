@@ -50,9 +50,8 @@ object Run extends JFXApp {
   /// Adds the sheet to the currently open sheets in memory
   def addSheet(sheet: Sheet) = {
     sheets.addOne(sheet)
-    currentSheet = sheet.id
     tabbar.refresh(sheets.toSeq)
-    datapanel.refresh(Some(sheet))
+    selectSheet(sheet.id)
   }
   def selectSheet(id: Int) = {
     currentSheet = id
