@@ -13,6 +13,7 @@ class ReCoordinates extends Pane{
   val yAxis = new NumberAxis()
 
   val chart = new LineChart(xAxis, yAxis)
+  chart.setLegendVisible(false)
 
   def refresh(sheet: Option[Sheet], fitOption: Option[RegressionFit]) {
     val series = new XYChart.Series[Number, Number]()
