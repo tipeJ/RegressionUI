@@ -9,20 +9,15 @@ import scalafx.geometry.Insets
 import scalafx.scene.control._
 import scalafx.collections._
 import scalafx.scene.control.TableColumn._
-import scalafx.beans.property.DoubleProperty
-import scalafx.beans.property.ObjectProperty
-import scalafx.beans.property.ReadOnlyDoubleWrapper
+import scalafx.beans.property._
 import scalafx.beans.value.ObservableValue
 import scalafx.stage.FileChooser
 import regression.ui._
 import java.io.{File, InputStreamReader, FileInputStream, BufferedReader}
-import regression.io.DatasetLoader
-import regression.io.CorruptedDatasetException
+import regression.io._
 import regression.models.Sheet
 import scala.collection.mutable.Buffer
-import regression.io.Dataset
-import regression.io.LinearFit
-import regression.io.QuadraticFit
+import regression.io._
 
 object Run extends JFXApp {
 
@@ -37,7 +32,7 @@ object Run extends JFXApp {
 
 
   // val menubarPH     = new HBox
-  val menuB         = new ReMbar(stage, loadDataFile)
+  val menuB         = new ReMbar(stage, loadDataFile, switchFit)
   val tabbar        = new ReTabBar(removeSheet, selectSheet)
   val datapanel     = new ReDataPanel
   val coordinates   = new ReCoordinates
@@ -50,6 +45,7 @@ object Run extends JFXApp {
                                         ), "XAX", "YAX"))
   var sheets = Buffer[Sheet]()
   var currentSheet = 0
+  var currentFit : Option[RegressionFit] = None
   def getSheet(id: Int) : Option[Sheet] = sheets.filter(_.id == id).lift(0)
   /// Adds the sheet to the currently open sheets in memory
   def addSheet(sheet: Sheet) = {
@@ -70,16 +66,20 @@ object Run extends JFXApp {
       selectSheet(newId)
     }
   }
-  def refreshCoordinates() {
-    val sheetOption = getSheet(currentSheet)
-    sheetOption match {
-      case Some(sheet) => {
-        val newFit = new QuadraticFit(sheet.dataset.data.toList)
-        coordinates.refresh(sheet.dataset, newFit)
-        menuB.refresh(Some(newFit))
+  def refreshCoordinates() = {
+    coordinates.refresh(getSheet(currentSheet), currentFit)
+  }
+  def switchFit(newFit: String) : Unit = {
+    currentFit = getSheet(currentSheet) match {
+      case None => None
+      case Some(sheet) => newFit match {
+        case "Linear Fit" => Some(new LinearFit(sheet.dataset.data.toList))
+        case "Quadratic Fit" => Some(new QuadraticFit(sheet.dataset.data.toList))
+        case _ => None
       }
-      case None => println("TODO: Add empty data disclaimer")
     }
+    menuB.refresh(currentFit)
+    refreshCoordinates()
   }
   menuB.refresh(None)
   tabbar.refresh(Seq())
@@ -117,7 +117,7 @@ object Run extends JFXApp {
   // Initialize the first sheet id
   var newId = 0
   /// Loads a sheet from a file
-  def loadDataFile(f: File) = {
+  def loadDataFile(f: File) : Unit = {
     def showError(message: String) {
       val alert = new Alert(Alert.AlertType.Error)
       alert.title_=("Error")

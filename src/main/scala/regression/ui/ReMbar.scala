@@ -9,7 +9,7 @@ import java.io.File
 import regression.io._
 
 
-class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
+class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (String) => Unit) {
 
   val node = new HBox
 
@@ -19,7 +19,7 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
       val fileChooser = new FileChooser()
       fileChooser.setTitle("Open data file")
       val file = fileChooser.showOpenDialog(stage)
-      loadFileCallback(file)
+      this.loadFileCallback(file)
     }
     val fitValue = fit match {
       case Some(fit: LinearFit)    => "Linear Fit"
@@ -29,7 +29,7 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
     val fitComboBox = new ComboBox[String]
     fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")
     fitComboBox.onAction = (event) => {
-
+      this.switchFit(fitComboBox.value.value)
     }
     fitComboBox.value.value_=(fitValue)
 
