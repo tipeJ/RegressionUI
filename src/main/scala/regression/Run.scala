@@ -102,10 +102,10 @@ object Run extends JFXApp {
   val row1 = new RowConstraints
   val row2 = new RowConstraints
 
-  row0.setMinHeight(30.0)
-  row0.setMaxHeight(30.0)
-  row1.setMinHeight(35.0)
-  row1.setMaxHeight(35.0)
+  row0.setMinHeight(26.0)
+  row0.setMaxHeight(26.0)
+  row1.setMinHeight(30.0)
+  row1.setMaxHeight(30.0)
   row2.setMinHeight(250.0)
   row2.setVgrow(Priority.ALWAYS)
 
@@ -116,10 +116,6 @@ object Run extends JFXApp {
   root.add(new VBox(tabbar.tabpanel),         0, 1, 2, 1)
   root.add(datapanel.table,                   0, 2, 1, 1)
   root.add(coordinates.chart,                     1, 2, 1, 1)
-
-  // tabbarPH.setBackground(new Background(Array(new BackgroundFill(Color.Beige, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
-  menuB.node.setBackground(new Background(Array(new BackgroundFill(Color.Cyan, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
-  datapanel.table.setBackground(new Background(Array(new BackgroundFill(Color.Gray, new CornerRadii(0), Insets.Empty)))) //Set sideBox background color
 
   // Initialize the first sheet id
   var newId = 0
