@@ -33,7 +33,9 @@ class ReDataPanel() {
       text = valuesLabel
       cellValueFactory = features => ReadOnlyDoubleWrapper.apply(features.value.v.value).asInstanceOf[ObservableValue[String, String]]
     }
-    table.columns.setAll(keyColumn, valueColumn)
+    keyColumn.setSortType(TableColumn.SortType.Ascending)
     table.setItems(obs)
+    table.columns.setAll(keyColumn, valueColumn)
+    table.getSortOrder.add(keyColumn)
   }
 }
