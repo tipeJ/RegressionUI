@@ -1,3 +1,21 @@
+# Interim report 3 (14.4)
+Added functionality:
+ - Implementation for Linear regression via least squares method. Seems to be working as intented, but I will add tests before the final submission to further verify.
+ - Implementation for quadratic regression via least squares method. Again, more tests required.
+ - Working coordinates view, with modifiable regression color scheme and axis labels.
+ - More menubar functionality, including button to change current regression fit, button to display the fit equation and a button to change the trendline color.
+
+The application works as intended in the project plan file. More additional functionality may be added before the final submission date (I have some exams this week). Coordinates zoom-in feature might be added, although I don't think it's really necessary for the purpose of the program, and testing/other functionality will come first.
+
+Encountered difficulties:
+ - The least squares method for the linear regression was rather simple to implement based on the wikipedia source, but the quadratic counterpart was quite a bit harder. The reason why I changed the method from the intended LaGrange polynomials to the Least Squares one was that I found out that the former results in a trendline which goes through all of the data points, which would create a very complex polynomial and not the second degree one I wanted.
+ - Some problems regarding the UI layout of the application, namely the scaling of the coordinate panel.
+ - It turned out that the ScalaFX Linechart class was satisfactory to implement the coordinates panel (I initially planned to do a completely custom view), which speeded up the development significantly.
+
+Workload: About 12-14 hours
+
+Currently I'm ahead of the schedule I presented in the project plan, but I feel like there will be plenty of stuff to go through in the last two weeks.
+
 # Interim report 2 (31.3)
 
 Added functionality:
