@@ -18,6 +18,7 @@ import regression.io._
 import regression.models.Sheet
 import scala.collection.mutable.Buffer
 import regression.io._
+import scalafx.scene.text.Text
 
 object App extends JFXApp {
 
@@ -35,6 +36,7 @@ object App extends JFXApp {
   val menuB         = new ReMbar(stage, loadDataFile, switchFit)
   val tabbar        = new ReTabBar(removeSheet, selectSheet)
   val datapanel     = new ReDataPanel
+  val equationText  = new Label
   val coordinates   = new ReCoordinates
 
   val testSheet = new Sheet("yestsheet", 0, new Dataset(Map[Double, Double](
@@ -85,10 +87,15 @@ object App extends JFXApp {
       }
     }
     menuB.refresh(currentFit)
+    equationText.text_=(currentFit match {
+                          case Some(fit) => fit.formattedExpression
+                          case None      => ""
+                        })
     refreshCoordinates()
   }
   menuB.refresh(None)
   tabbar.refresh(Seq(), -1)
+  equationText.padding_=(Insets.apply(0, 0, 0, 25))
   refreshCoordinates()
 
 
@@ -101,21 +108,25 @@ object App extends JFXApp {
   val row0 = new RowConstraints
   val row1 = new RowConstraints
   val row2 = new RowConstraints
+  val row3 = new RowConstraints
 
   row0.setMinHeight(26.0)
   row0.setMaxHeight(26.0)
   row1.setMinHeight(30.0)
   row1.setMaxHeight(30.0)
-  row2.setMinHeight(250.0)
-  row2.setVgrow(Priority.ALWAYS)
+  row2.setMinHeight(25.0)
+  row2.setMaxHeight(25.0)
+  row3.setMinHeight(250.0)
+  row3.setVgrow(Priority.ALWAYS)
 
   root.columnConstraints = Array[ColumnConstraints](column0, column1)
-  root.rowConstraints    = Array[RowConstraints](row0, row1, row2)
+  root.rowConstraints    = Array[RowConstraints](row0, row1, row2, row3)
 
-  root.add(menuB.node,                        0, 0, 2, 1)
-  root.add(new VBox(tabbar.tabpanel),         0, 1, 2, 1)
-  root.add(datapanel.table,                   0, 2, 1, 1)
-  root.add(coordinates.chart,                     1, 2, 1, 1)
+  root.add(menuB.node,                            0, 0, 2, 1)
+  root.add(new VBox(tabbar.tabpanel),             0, 1, 2, 1)
+  root.add(datapanel.table,                       0, 2, 1, 2)
+  root.add(equationText,                          1, 2, 1, 1)
+  root.add(coordinates.chart,                     1, 3, 1, 1)
 
   // Initialize the first sheet id
   var newId = 0
