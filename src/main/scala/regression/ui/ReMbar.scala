@@ -9,7 +9,7 @@ import java.io.File
 import regression.io._
 import scalafx.scene.paint.Color
 
-
+/// Class for regression menubar.
 class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (String, Color) => Unit) {
 
   val node = new HBox
@@ -46,9 +46,10 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
 
     if (fit.nonEmpty) {
       fitInfoButton.onAction = (event) => {
-        val alert = new Alert(Alert.AlertType.Information)
+        val alert = new Alert(Alert.AlertType.None)
         alert.title_=("Equation")
         alert.setContentText(fit.get.formattedExpression)
+        alert.buttonTypes.addOne(ButtonType.Close)
         alert.show()
       }
       colorPicker.value_=(fit.get.color)
