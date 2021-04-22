@@ -48,7 +48,11 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
       fitInfoButton.onAction = (event) => {
         val alert = new Alert(Alert.AlertType.None)
         alert.title_=("Equation")
-        alert.setContentText(fit.get.formattedExpression)
+        // alert.setContentText(fit.get.formattedExpression)
+        val eqText = new TextArea(fit.get.formattedExpression)
+        eqText.editable_=(false)
+        eqText.wrapText_=(true)
+        alert.getDialogPane().setContent(eqText)
         alert.buttonTypes.addOne(ButtonType.Close)
         alert.show()
       }
