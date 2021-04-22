@@ -19,7 +19,7 @@ import regression.models.Sheet
 import scala.collection.mutable.Buffer
 import regression.io._
 
-object Run extends JFXApp {
+object App extends JFXApp {
 
   stage = new JFXApp.PrimaryStage {
     title.value = "Regression UI"
