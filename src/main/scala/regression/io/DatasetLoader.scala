@@ -15,7 +15,6 @@ object DatasetLoader {
       var line: String = null
       // Get all contents of the reader
       while({line = bfr.readLine; line != null}) jsonString += line
-      println("JSON" + jsonString)
 
       implicit val formats = org.json4s.DefaultFormats
       val map = parse(jsonString).extract[Map[String, Any]]
