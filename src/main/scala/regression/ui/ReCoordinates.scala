@@ -17,6 +17,23 @@ class ReCoordinates extends Pane{
   var chart = new LineChart(xAxis, yAxis)
   chart.setLegendVisible(false)
 
+  def changeAxisEndpoints(points: AxisEndpoints) {
+    if (!points.auto) {
+      xAxis.setAutoRanging(false)
+      xAxis.setLowerBound(points.xStart)
+      xAxis.setUpperBound(points.xEnd)
+      xAxis.setTickUnit(points.getXTickUnit)
+
+      yAxis.setAutoRanging(false)
+      yAxis.setLowerBound(points.yStart)
+      yAxis.setUpperBound(points.yEnd)
+      yAxis.setTickUnit(points.getYTickUnit)
+    } else {
+      xAxis.setAutoRanging(true)
+      yAxis.setAutoRanging(true)
+    }
+  }
+
   def refresh(sheet: Option[Sheet], fitOption: Option[RegressionFit]) {
     val series = new XYChart.Series[Number, Number]()
     val trendline = new XYChart.Series[Number, Number]()
@@ -62,4 +79,11 @@ class ReCoordinates extends Pane{
     series.getNode().lookup(".chart-series-line").setStyle("-fx-stroke: transparent;") // Hide data points line that is visible by default
     trendline.getNode().lookup(".chart-series-line").setStyle(s"-fx-stroke: rgba($r, $g, $b, 1.0);")
   }
+}
+
+case class AxisEndpoints (auto: Boolean = false, xStart: Double = 0, xEnd: Double = 1, yStart: Double = 0, yEnd: Double = 1) {
+  if (!auto && (xStart >= xEnd || yStart >= yEnd)) throw new IllegalArgumentException("Lower bounds of axes must not be greater than the upper bounds")
+
+  def getXTickUnit : Double = (xEnd - xStart) / 10.0
+  def getYTickUnit : Double = (yEnd - yStart) / 10.0
 }

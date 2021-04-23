@@ -33,7 +33,7 @@ object App extends JFXApp {
 
 
   // val menubarPH     = new HBox
-  val menuB         = new ReMbar(stage, loadDataFile, switchFit)
+  val menuB         = new ReMbar(stage, loadDataFile, switchFit, refreshCoordinatesEndpoints)
   val tabbar        = new ReTabBar(removeSheet, selectSheet)
   val datapanel     = new ReDataPanel
   val equationText  = new Label
@@ -68,6 +68,7 @@ object App extends JFXApp {
     }
   }
   def refreshCoordinates() : Unit = coordinates.refresh(getSheet(currentSheet), currentFit)
+  def refreshCoordinatesEndpoints(points: AxisEndpoints) : Unit = coordinates.changeAxisEndpoints(points)
   def switchFit(newFit: String, color: Color) : Unit = {
     getSheet(currentSheet) match {
       case Some(sheet) => {
