@@ -72,8 +72,8 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
       // Show the dialog for axis endpoints.
       val dialog = new Dialog[Option[AxisEndpoints]]() {
         initOwner(stage)
-        title = "Axis Endpoints"
-        headerText = "Set Axis Endpoints"
+        title = "Axis Ranges"
+        headerText = "Set Axis Ranges"
       }
       val applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OKDone)
       dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.Cancel)
