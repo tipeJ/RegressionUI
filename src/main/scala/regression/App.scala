@@ -19,6 +19,7 @@ import regression.models.Sheet
 import scala.collection.mutable.Buffer
 import regression.io._
 import scalafx.scene.text.Text
+import java.io.FileNotFoundException
 
 object App extends JFXApp {
 
@@ -147,6 +148,7 @@ object App extends JFXApp {
         val data = ext match {
           case "json" => DatasetLoader.loadJSONFile(reader)
           case "txt"  => DatasetLoader.loadStandardFile(reader)
+          case _      => throw new FileNotFoundException
         }
         val nameDialog = new TextInputDialog
         nameDialog.setContentText("Sheet name")
@@ -160,7 +162,8 @@ object App extends JFXApp {
           case None       =>
         }
       } catch {
-        case dsE : CorruptedDatasetException => showError("Error loading dataset")
+        case dsE : CorruptedDatasetException => showError("Error loading dataset.")
+        case fE  : FileNotFoundException => showError("Invalid file selected.")
         case e   : Exception => showError("Error loading file: " + e.getMessage())
       }
     }
