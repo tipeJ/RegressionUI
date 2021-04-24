@@ -37,7 +37,9 @@ object App extends JFXApp {
   val menuB         = new ReMbar(stage, loadDataFile, switchFit, refreshCoordinatesEndpoints)
   val tabbar        = new ReTabBar(removeSheet, selectSheet)
   val datapanel     = new ReDataPanel
-  val equationText  = new Label
+  val equationText  = new Label {
+    padding = Insets.apply(0, 0, 0, 25)
+  }
   val coordinates   = new ReCoordinates
 
   val testSheet = new Sheet("yestsheet", 0, new Dataset(Map[Double, Double](
@@ -97,9 +99,7 @@ object App extends JFXApp {
   }
   menuB.refresh(None)
   tabbar.refresh(Seq(), -1)
-  equationText.padding_=(Insets.apply(0, 0, 0, 25))
   refreshCoordinates()
-
 
   val column0 = new ColumnConstraints
   val column1 = new ColumnConstraints
