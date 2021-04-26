@@ -12,15 +12,23 @@ import javafx.util.converter.IntegerStringConverter
 import javafx.scene.control
 import scalafx.scene.layout.GridPane
 import scalafx.geometry.Insets
+import regression.RegressionController
 
 /// Class for regression menubar.
-class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (String, Color) => Unit, refreshEndpoints: (AxisEndpoints) => Unit) {
+class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
 
   val node = new HBox
 
-  private var endpointsOptionsVisible = false
+  val fitComboBox = new ComboBox[String]
+  fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")
 
-  def refresh(fit: Option[RegressionFit]) : Unit = {
+  // Button for displaying the equation
+  val fitInfoButton = new Button("Show equation")
+
+  // Button for changing the regression color
+  val colorPicker = new ColorPicker()
+
+  def init(controller: RegressionController) = {
     // Button for loading a new datasheet
     val loadDataButton = new Button("Open file")
     loadDataButton.onAction = (event) => {
@@ -29,52 +37,51 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
       val file = fileChooser.showOpenDialog(stage)
       this.loadFileCallback(file)
     }
-
-    val fitValue = fit match {
-      case Some(fit: LinearFit)    => "Linear Fit"
-      case Some(fit: QuadraticFit) => "Quadratic Fit"
-      case _                       => "No Fit"
-    }
     // Dropdown menu for switching regression type
     val fitComboBox = new ComboBox[String]
     fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")
     fitComboBox.onAction = (event) => {
-      val color = if (fit.nonEmpty) fit.get.color else Color.DarkBlue
-      this.switchFit(fitComboBox.value.value, color)
+      controller.switchFit(fitComboBox.value.value)
     }
-    fitComboBox.value.value_=(fitValue)
-
-    // Button for displaying the equation
-    val fitInfoButton = new Button("Show equation")
-
-    // Button for changing the regression color
-    val colorPicker = new ColorPicker()
-
-    if (fit.nonEmpty) {
-      fitInfoButton.onAction = (event) => {
-        val alert = new Alert(Alert.AlertType.None)
-        alert.title_=("Equation")
-        // alert.setContentText(fit.get.formattedExpression)
-        val eqText = new TextArea(fit.get.formattedExpression)
-        eqText.editable_=(false)
-        eqText.wrapText_=(true)
-        alert.getDialogPane().setContent(eqText)
-        alert.buttonTypes.addOne(ButtonType.Close)
-        alert.show()
+    controller.currentFit.addListener(
+      (obs, oldFit, fit) => {
+        val fitValue = fit match {
+          case Some(fit: LinearFit)    => "Linear Fit"
+          case Some(fit: QuadraticFit) => "Quadratic Fit"
+          case _                       => "No Fit"
+        }
+        fitComboBox.value.value_=(fitValue)
+        fitInfoButton.onAction = (event) => {
+          if (fit.nonEmpty) {
+            val alert = new Alert(Alert.AlertType.None)
+            alert.title_=("Equation")
+            // alert.setContentText(fit.get.formattedExpression)
+            val eqText = new TextArea(fit.get.formattedExpression)
+            eqText.editable_=(false)
+            eqText.wrapText_=(true)
+            alert.getDialogPane().setContent(eqText)
+            alert.buttonTypes.addOne(ButtonType.Close)
+            alert.show()
+          }
+        }
+        if (fit.nonEmpty) {
+          colorPicker.value_=(fit.get.color)
+        }
       }
-      colorPicker.value_=(fit.get.color)
-      colorPicker.onAction = (event) => this.switchFit(fitComboBox.value.value, new Color(colorPicker.getValue))
-    }
+    )
+
+
+    colorPicker.onAction = (event) => controller.switchColor(new Color(colorPicker.getValue))
 
     // Button for changing axis endpoints.
     val axisEndpointsButton = new Button("Axis endpoints")
-    axisEndpointsButton.onAction = (event) => showAxisRangeDialog()
+    axisEndpointsButton.onAction = (event) => showAxisRangeDialog(controller)
 
     val nSeq = Seq[Node](loadDataButton, fitComboBox, fitInfoButton, colorPicker, axisEndpointsButton)
     node.children_=(nSeq)
   }
 
-  private def showAxisRangeDialog() = {
+  private def showAxisRangeDialog(controller: RegressionController) = {
     // Show the dialog for axis endpoints.
     val dialog = new Dialog[Option[AxisEndpoints]]() {
       initOwner(stage)
@@ -162,7 +169,7 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
     // Show the dialog and wait for the result.
     result match {
       case Some(op: Option[AxisEndpoints]) => op match {
-        case Some(endpoints: AxisEndpoints) => refreshEndpoints(endpoints)
+        case Some(endpoints: AxisEndpoints) => controller.setAxisEndpoints(endpoints)
         case None => {
           val alert = new Alert(Alert.AlertType.Error)
           alert.title_=("Error")
@@ -170,6 +177,7 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit, switchFit: (Str
           alert.show()
         }
       }
+      // Handle cancellation
       case _ =>
     }
   }

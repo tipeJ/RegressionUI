@@ -20,86 +20,41 @@ import scala.collection.mutable.Buffer
 import regression.io._
 import scalafx.scene.text.Text
 import java.io.FileNotFoundException
+import regression.RegressionController
 
 object App extends JFXApp {
 
   stage = new JFXApp.PrimaryStage {
-    title.value = "Regression UI"
+    title.value = "Regression Visualization"
     width = 750
     height = 550
   }
   val root = new GridPane
   val scene = new Scene(root)
   stage.scene = scene
+  val controller = new RegressionController
 
 
   // val menubarPH     = new HBox
-  val menuB         = new ReMbar(stage, loadDataFile, switchFit, refreshCoordinatesEndpoints)
-  val tabbar        = new ReTabBar(removeSheet, selectSheet)
+  val menuB         = new ReMbar(stage, loadDataFile)
+  val tabbar        = new ReTabBar
   val datapanel     = new ReDataPanel
   val equationText  = new Label {
     padding = Insets.apply(0, 0, 0, 25)
   }
+  // Add a listener for current equation:
+  controller.currentFit.addListener(
+    (_, __, fit) => {
+      val text = if (fit.nonEmpty) fit.get.formattedExpression else ""
+      equationText.text_=(text)
+    }
+  )
   val coordinates   = new ReCoordinates
 
-  val testSheet = new Sheet("yestsheet", 0, new Dataset(Map[Double, Double](
-                                          2.1 -> 5.7,
-                                          5.1 -> 13.9,
-                                          7.88 -> 17.6,
-                                          10.0 -> 20.96
-                                        ), "XAX", "YAX"), "Linear Fit")
-  var sheets = Buffer[Sheet]()
-  var currentSheet = 0
-  var currentFit : Option[RegressionFit] = None
-  def getSheet(id: Int) : Option[Sheet] = sheets.filter(_.id == id).lift(0)
-  /// Adds the sheet to the currently open sheets in memory
-  def addSheet(sheet: Sheet) = {
-    sheets.addOne(sheet)
-    selectSheet(sheet.id)
-    tabbar.refresh(sheets.toSeq, sheets.indexWhere(_.id == currentSheet))
-  }
-  def selectSheet(id: Int) = {
-    currentSheet = id
-    datapanel.refresh(getSheet(currentSheet))
-    updateFit(if (currentFit.nonEmpty) currentFit.get.color else Color.DarkBlue)
-  }
-  def removeSheet(id: Int) = {
-    sheets.remove(sheets.indexWhere(_.id == id))
-    if (currentSheet == id) {
-      val newId = if (sheets.nonEmpty) sheets(0).id else -1
-      selectSheet(newId)
-    }
-  }
-  def refreshCoordinates() : Unit = coordinates.refresh(getSheet(currentSheet), currentFit)
-  def refreshCoordinatesEndpoints(points: AxisEndpoints) : Unit = coordinates.changeAxisEndpoints(points)
-  def switchFit(newFit: String, color: Color) : Unit = {
-    getSheet(currentSheet) match {
-      case Some(sheet) => {
-        sheet.fit = newFit
-        updateFit(color)
-      }
-      case None =>
-    }
-  }
-  def updateFit(color: Color) : Unit = {
-    currentFit = getSheet(currentSheet) match {
-      case None => None
-      case Some(sheet) => sheet.fit match {
-        case "Linear Fit" => Some(new LinearFit(sheet.dataset.data.toList, color))
-        case "Quadratic Fit" => Some(new QuadraticFit(sheet.dataset.data.toList, color))
-        case _ => None
-      }
-    }
-    menuB.refresh(currentFit)
-    equationText.text_=(currentFit match {
-                          case Some(fit) => fit.formattedExpression
-                          case None      => ""
-                        })
-    refreshCoordinates()
-  }
-  menuB.refresh(None)
-  tabbar.refresh(Seq(), -1)
-  refreshCoordinates()
+  menuB.init(controller)
+  datapanel.init(controller)
+  tabbar.init(controller)
+  coordinates.init(controller)
 
   val column0 = new ColumnConstraints
   val column1 = new ColumnConstraints
@@ -155,8 +110,9 @@ object App extends JFXApp {
         val nameResult = nameDialog.showAndWait()
         nameResult match {
           case Some(name) => {
-            val sheetName = if (name.isEmpty) s"Sheet ${(sheets.length + 1).toString}" else name
-            addSheet(new Sheet(name, newId, data, "Linear Fit"))
+            val sheetName = if (name.isEmpty) s"Sheet $newId" else name
+            controller.addSheet(new Sheet(name, newId, data, "Linear Fit"))
+            controller.switchFit("Linear Fit")
             newId = newId + 1
           }
           case None       =>
