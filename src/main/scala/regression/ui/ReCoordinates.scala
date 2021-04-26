@@ -23,22 +23,6 @@ class ReCoordinates extends Pane{
   }
   chart.setLegendVisible(false)
 
-  def changeAxisEndpoints(points: AxisEndpoints) {
-    if (!points.auto) {
-      xAxis.setAutoRanging(false)
-      xAxis.setLowerBound(points.xStart)
-      xAxis.setUpperBound(points.xEnd)
-      xAxis.setTickUnit(points.getXTickUnit)
-
-      yAxis.setAutoRanging(false)
-      yAxis.setLowerBound(points.yStart)
-      yAxis.setUpperBound(points.yEnd)
-      yAxis.setTickUnit(points.getYTickUnit)
-    } else {
-      xAxis.setAutoRanging(true)
-      yAxis.setAutoRanging(true)
-    }
-  }
   def init(controller: RegressionController) {
     controller.axisEndPoints.addListener(
       (_, old, points) => {
