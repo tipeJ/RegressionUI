@@ -71,6 +71,8 @@ class ReCoordinates extends Pane{
         val sheet = controller.currentSheet.get
         if (sheet.nonEmpty) {
           val set = sheet.get.dataset
+          chart.XAxis.label_=(set.keysLabel)
+          chart.YAxis.label_=(set.valuesLabel)
           series = redrawSeriesPoints(set, r, g, b)
 
           // Draw the regression trendline
