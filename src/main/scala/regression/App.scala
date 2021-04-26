@@ -34,14 +34,13 @@ object App extends JFXApp {
   stage.scene = scene
   val controller = new RegressionController
 
-
-  // val menubarPH     = new HBox
   val menuB         = new ReMbar(stage, loadDataFile)
   val tabbar        = new ReTabBar
   val datapanel     = new ReDataPanel
   val equationText  = new Label {
     padding = Insets.apply(0, 0, 0, 25)
   }
+
   // Add a listener for current equation:
   controller.currentFit.addListener(
     (_, __, fit) => {

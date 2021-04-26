@@ -7,14 +7,20 @@ import scalafx.scene.paint.Color
 import scalafx.collections.ObservableBuffer
 import regression.ui.AxisEndpoints
 
+// This class controls the UI with observable values and arrays.
 class RegressionController {
+
+  // All the sheets currently open in memory.
   val sheets        = new ObservableBuffer[Sheet]()
+  // The currently selected Axis Endpoints.
   val axisEndPoints = new ObjectProperty[AxisEndpoints](){
     value_=(new AxisEndpoints)
   }
+  // The currently selected sheet.
   val currentSheet  = new ObjectProperty[Option[Sheet]](){
     value_=(None)
   }
+  // The currently selected fit.
   val currentFit    = new ObjectProperty[Option[RegressionFit]](){
     value_=(None)
   }
