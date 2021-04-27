@@ -46,11 +46,9 @@ class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
     // Dropdown menu for switching regression type
     val fitComboBox = new ComboBox[String]
     fitComboBox.items.get().addAll("Linear Fit", "Quadratic Fit", "No Fit")
-    fitComboBox.onAction = (event) => {
-      controller.switchFit(fitComboBox.value.value)
-    }
+    fitComboBox.onAction = (_) => controller.switchFit(fitComboBox.value.value)
     controller.currentFit.addListener(
-      (obs, oldFit, fit) => {
+      (_, _, fit) => {
         val fitValue = fit match {
           case Some(fit: LinearFit)    => "Linear Fit"
           case Some(fit: QuadraticFit) => "Quadratic Fit"
@@ -76,7 +74,7 @@ class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
     )
 
 
-    colorPicker.onAction = (event) => controller.switchColor(new Color(colorPicker.getValue))
+    colorPicker.onAction = (_) => controller.switchColor(new Color(colorPicker.getValue))
 
     // Button for changing axis endpoints.
     val axisEndpointsButton = new Button("Axis endpoints")
@@ -88,7 +86,7 @@ class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
 
   private def showAxisRangeDialog(controller: RegressionController) = {
     // Show the dialog for axis endpoints.
-    val dialog = new Dialog[Option[AxisEndpoints]]() {
+    val dialog = new Dialog[AxisEndpoints]() {
       initOwner(stage)
       title = "Axis Ranges"
       headerText = "Set Axis Ranges"
@@ -155,13 +153,20 @@ class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
       if (dialogButton == applyButtonType) {
         if (autoCheckBox.selected.value) {
           // Return AxisEndpoints with automatic scaling.
-          Some(new AxisEndpoints(true))
+          new AxisEndpoints(true)
         } else {
+          // Try to return an AxisEndpoints object with custom ranges
           try {
-            // Try to return an AxisEndpoints object with custom ranges. Return None if Exception met (Either double conversion error or an invalid parameters error).
-            Some(new AxisEndpoints(false, xAxisStart.text.value.toDouble, xAxisEnd.text.value.toDouble, yAxisStart.text.value.toDouble, yAxisEnd.text.value.toDouble))
+            new AxisEndpoints(false, xAxisStart.text.value.toDouble, xAxisEnd.text.value.toDouble, yAxisStart.text.value.toDouble, yAxisEnd.text.value.toDouble)
           } catch {
-            case e: Exception => None
+            case e: Exception => {
+              val alert = new Alert(Alert.AlertType.Error) {
+                title = "Error"
+                contentText = "Invalid parameters. The given start values should be lower than the corresponding end values."
+              }
+              alert.show()
+              new AxisEndpoints(true)
+            }
           }
         }
       } else {
@@ -169,19 +174,11 @@ class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
       }
     }
 
-    val result = dialog.showAndWait()
 
     // Show the dialog and wait for the result.
+    val result = dialog.showAndWait()
     result match {
-      case Some(op: Option[AxisEndpoints]) => op match {
-        case Some(endpoints: AxisEndpoints) => controller.setAxisEndpoints(endpoints)
-        case None => {
-          val alert = new Alert(Alert.AlertType.Error)
-          alert.title_=("Error")
-          alert.setContentText("Invalid parameters. The given start values should be lower than the corresponding end values.")
-          alert.show()
-        }
-      }
+      case Some(endpoints: AxisEndpoints) => controller.setAxisEndpoints(endpoints)
       // Handle cancellation
       case _ =>
     }
