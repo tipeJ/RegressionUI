@@ -1,0 +1,171 @@
+#+AUTHOR: Tiitus Järvinen (793430)
+#+TITLE: Regression visualization project document
+
+* Personal information
+
+  | Title          | Regression UI                     |
+  | Student name   | Tiitus Järvinen                   |
+  | Student number | 793430                            |
+  | Degree program | Tietotekniikka (Computer Science) |
+  | Year           | 1st                               |
+  | Date           | 28.4.2021                         |
+
+* General description
+  The goal of this program is to fit a regression model to a dataset given bythe user. The user should be able to load the dataset from a file or evenfrom a clipboard. The user should be able to configure the appearance ofthe regression fit and coordinates.
+
+  The program meets the advanced requirements, with two supported file types (.txt and .json) and two implemented polynomial regression fits (1st and 2nd degree equations).
+
+* User interface
+  The program is started by building the source code.
+
+  [[./screenshots/general.png]]
+  The UI consists of four different parts:
+  1. Menubar
+  2. Data Panel
+  3. Tab bar
+  4. Coordinates
+
+** Menubar
+
+   [[./screenshots/menubar.png]]
+
+   The menubar contains the controls of the application.
+
+   The Open file-button opens a dialog which the user can use to import data to the software.
+   The Fit-switch button allows the user to choose which fit they want to use with the data.
+   The Show equation-button allows the user to view the equation of the current fit in a selectable text field.
+   The Color switcher allows the user to choose which colour to draw the data points and the fit with.
+   The Axis endpoints-button allows the user to choose the axis ranges displayed on the coordinates panel. The default "fit into view" option zooms out to show the entire dataset.
+
+** Tab bar
+
+   [[./screenshots/tabbar.png]]
+
+   The tabbar allows the user to have multiple datasets open at once, and switch between them.
+
+** Data panel
+   
+   #+LaTeX:\includegraphics[width = 0.43\textwidth]{screenshots/datapanel.png}
+
+   The data panel allows the user to view the open dataset in an excel-like way. Editing is not allowed though.
+
+** Coordinates
+
+   [[./screenshots/coordinates.png]]
+
+   The heart and soul of the program. Displays the given dataset points in a 2D coordinate system, with axis labels. The user can view data of individual points by clicking on them, and choose the drawn regression fit from the menubar.
+
+   This component also displays the current fit equation above the coordinates.
+
+* Program structure
+
+  The program UI is composed within the App class and the individual UI components are separated into separate .scala files in the ui subpackage. The UI is controller by the RegressionController class by Observable values, which the UI objects add listeners to as needed.
+
+  Here is a UML draft: [[./screenshots/UML.png]]
+
+  The RegressionController instance is passed onto every UI Component that requires it, and when changes are needed the UI components call the functions in the controller, which in turn triggers the listeners of all other UI components.
+
+* Algorithms
+
+** File loader algorithm
+
+   Loads the given file into a Dataset model. The implementation resembles the Chess-program from the OS2 exercises.
+
+** Linear Regression
+   Uses the [[https://en.wikipedia.org/wiki/Least_squares][Least Squares Method]] to create a linear scatter plot. Once the slope is calculated, the coordinates object draws it.
+   
+** 2nd Degree regression
+   Uses the [[https://en.wikipedia.org/wiki/Least_squares][Least Squares Method]] to create the second degree polynomial fit into the given dataset.
+   
+* Data structures
+
+  The RegressionController stores the sheets and current fit and axisendpoints into observable values, which the UI components can add listeners to. The sheets are contained within an ObservableList, whereas the singular objects are contained within ObjectProperties.
+
+  The Sheet class includes a Dataset class, which will store the points as a Map object. A map object is the most logical solution for connecting two values to each other. In addition, it ensures that the values can be in whatever order. Also, a map structure ensures that no values have the same key, which is essential for the regression analysis part.
+
+  Alternatively, a custom data model could have been used, but it would have no visible benefits to a Map object.
+  
+* Files and internet access
+
+  The program does not access or require internet in any way.
+  
+  The program interacts with .txt and .json files. It can open then and parse a set of data points (X-Y) from them. The program does not save the data in any format, nor does it allow for modifying open data in memory, as the purpose of the application is to simply visualize the regression.
+
+** Standard (TXT) format
+
+   File saved with a .txt extension. Contains:
+   1. Dataset X and Y axis labels, separated by a ":"
+   2. Dataset points in tuple format, with numbers separated by a ":"
+
+  Examples can be found in the example data directory. Here is one:
+
+  xaxislabel: yaxislabel
+  
+  1.0 : 20.9
+  
+  2.1 : 60.4
+  
+  5.1 : 99.2
+
+  
+** JSON format
+
+   File saved with a .json extension. Contains the following format:
+   
+#+BEGIN_SRC json
+  {
+    "keysLabel" : "sample keys label",
+    "valuesLabel" : "sample values label",
+    "data" : {
+      "1.0" : 20.9,
+      "2.1" : 60.4,
+      "5.1" : 99.2
+    }
+  }
+#+END_SRC
+
+* Testing
+  The program was tested both automatically and manually during the development process. The testing resembled the planned testing process. By far the biggest testing challenge was the dataset loader part, as it is the most prone to errors. These tests can be ran as regular scalatests.
+
+  The UI part of the application was tested manually, by selecting various correct and incorrect values in configuration dialogs and other options.
+
+* Known bugs and missing features
+  Bugs:
+  - The standard .txt file format is not parsed correctly if there is an empty line at the end of file. Fixing this should be easy if needed later on.
+    
+  Missing features:
+  - You could always have more regression options. Right now I've settled with the two required by the advanced difficulty, but I've structured the data model in a way which allows for easy future expansion.
+  - The zoom-feature for the coordinate system was not implemented. Currently the user can zoom by selecting the axis ranges manually, but zooming feature with a scrollwheel could be achieved by the same logic as used in the AxisEndpoints method.
+  - CSV format was not implemented. Would require another method in DatasetLoader class.
+  - Modifying the data stored in the memory could be a great addition, but not really necessary for the purpose of this program.
+    
+* 3 best sides and 3 weaknesses
+  
+** Best sides
+   1. I liked the way I structured the UI with the RegressionController class controlling the UI part of the program. Initially, I had various callback functions passed to the UI components, but now I've minimized those and greatly simplified implementing future features.
+   2. I prefer the LineChart as provided by the ScalaFX library to the custom implementation I initially wanted to build. The LineChart animates the changes as well!
+   3. I think the way I build the data model for the different regression fits allows for easy expansion in the future if wanted/needed.
+
+** Weaknesses
+   - The program misses some functionality that I initially wanted to implement. These are explained at length in the Known bugs and missing features section.
+   - Lack of automated UI testing. I feel that this could be a problem if this program was developed further, but currently the manual UI testing proved to be satisfactory. There are various UI testing automation libraries that could be used to accomplish this.
+
+* Derivations from the plan, realized process and schedule
+  When I created the initial plan, I thought the best way to implement the UI control would be the callback functions passed onto individual components. Instead, I choose to build a controller class similar to those I've used in my personal mobile app projects. Overall, the schedule wasn't a problem at any stage, and especially the regression algorithm implementation proved to be less time consuming, as the calculations were easy to implement by following the documentation in Wikipedia. In contrast, the UI part took a slightly longer time to fully realize.
+
+  I didn't originally intend to build the functionality for opening multiple datasets at once, nor did I plan to include the tabbar component. That took a few extra hours.
+  
+  As I've created various GUI applications in my free time for years, I didn't learn anything particularly new during this process, other than the ScalaFX/JavaFX side of things.
+
+  
+* Final evaluation
+  I think the final program meets the advanced requirements. The class structure could be improved in certain ways, especially the separation of UI and model logic, and would probably be necessary should the development continue further.
+
+  Overall the class structure is well planned to support making changes or future extensions and adding functionality.
+
+  If I started this process from the start again, I would directly abandon my plans for creating a custom canvas coordinates panel and go straight for the components provided by the ScalaFX library.
+
+* References
+
+  ScalaFX and JavaFX documentation.
+  [[https://en.wikipedia.org/wiki/Least_squares][Least Squares Method]] 
