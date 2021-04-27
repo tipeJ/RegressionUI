@@ -15,21 +15,21 @@ class RegressionController {
   val sheets        = new ObservableBuffer[Sheet]()
   // The currently selected Axis Endpoints.
   val axisEndPoints = new ObjectProperty[AxisEndpoints](){
-    value_=(new AxisEndpoints)
+    value = new AxisEndpoints
   }
   // The currently selected sheet.
   val currentSheet  = new ObjectProperty[Option[Sheet]](){
-    value_=(None)
+    value = None
   }
   // The currently selected fit.
   val currentFit    = new ObjectProperty[Option[RegressionFit]](){
-    value_=(None)
+    value = None
   }
 
   // Changes the currently selected sheet.
-  def setCurrentSheet(sheet: Sheet) = currentSheet.value_=(Some(sheet))
+  def setCurrentSheet(sheet: Sheet) = currentSheet.value = Some(sheet)
   // Sets the fit to the given one.
-  def setCurrentFit(fit: RegressionFit) = currentFit.value_=(Some(fit))
+  def setCurrentFit(fit: RegressionFit) = currentFit.value = Some(fit)
   // Switches the currently selected fit.
   def switchFit(newFit: String) : Unit = {
     val sheet = currentSheet.get()
