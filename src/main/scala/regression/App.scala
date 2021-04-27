@@ -34,20 +34,13 @@ object App extends JFXApp {
   stage.scene = scene
   val controller = new RegressionController
 
+  // Initialize the main UI components:
   val menuB         = new ReMbar(stage, loadDataFile)
   val tabbar        = new ReTabBar
   val datapanel     = new ReDataPanel
   val equationText  = new Label {
     padding = Insets.apply(0, 0, 0, 25)
   }
-
-  // Add a listener for current equation:
-  controller.currentFit.addListener(
-    (_, __, fit) => {
-      val text = if (fit.nonEmpty) fit.get.formattedExpression else ""
-      equationText.text_=(text)
-    }
-  )
   val coordinates   = new ReCoordinates
 
   menuB.init(controller)
@@ -55,6 +48,18 @@ object App extends JFXApp {
   tabbar.init(controller)
   coordinates.init(controller)
 
+  // Add a listener for current equation:
+  controller.currentFit.addListener(
+    (_, __, fit) => {
+      val text = fit match {
+        case Some(f) => f.formattedExpression
+        case None    => ""
+      }
+      equationText.text_=(text)
+    }
+  )
+
+  // Set the UI Grid layout:
   val column0 = new ColumnConstraints
   val column1 = new ColumnConstraints
 
