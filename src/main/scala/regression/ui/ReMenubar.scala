@@ -160,11 +160,7 @@ class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
             new AxisEndpoints(false, xAxisStart.text.value.toDouble, xAxisEnd.text.value.toDouble, yAxisStart.text.value.toDouble, yAxisEnd.text.value.toDouble)
           } catch {
             case e: Exception => {
-              val alert = new Alert(Alert.AlertType.Error) {
-                title = "Error"
-                contentText = "Invalid parameters. The given start values should be lower than the corresponding end values."
-              }
-              alert.show()
+              controller.showError("Invalid parameters. The given start values should be lower than the corresponding end values.")
               new AxisEndpoints(true)
             }
           }

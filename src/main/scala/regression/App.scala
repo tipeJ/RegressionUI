@@ -92,12 +92,6 @@ object App extends JFXApp {
   var newId = 0
   /// Loads a sheet from a file
   def loadDataFile(f: File) : Unit = {
-    def showError(message: String) {
-      val alert = new Alert(Alert.AlertType.Error)
-      alert.title_=("Error")
-      alert.setContentText(message)
-      alert.show()
-    }
     if (f != null && f.canRead()) {
       try {
         val reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)))
@@ -121,9 +115,9 @@ object App extends JFXApp {
           case None       =>
         }
       } catch {
-        case dsE : CorruptedDatasetException => showError("Error loading dataset.")
-        case fE  : FileNotFoundException => showError("Invalid file selected.")
-        case e   : Exception => showError("Error loading file: " + e.getMessage())
+        case dsE : CorruptedDatasetException => controller.showError("Error loading dataset.")
+        case fE  : FileNotFoundException => controller.showError("Invalid file selected.")
+        case e   : Exception => controller.showError("Error loading file: " + e.getMessage())
       }
     }
   }

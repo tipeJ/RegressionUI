@@ -6,6 +6,7 @@ import regression.io._
 import scalafx.scene.paint.Color
 import scalafx.collections.ObservableBuffer
 import regression.ui.AxisEndpoints
+import scalafx.scene.control.Alert
 
 // This class controls the UI with observable values and arrays.
 class RegressionController {
@@ -25,8 +26,11 @@ class RegressionController {
     value_=(None)
   }
 
+  // Changes the currently selected sheet.
   def setCurrentSheet(sheet: Sheet) = currentSheet.value_=(Some(sheet))
+  // Sets the fit to the given one.
   def setCurrentFit(fit: RegressionFit) = currentFit.value_=(Some(fit))
+  // Switches the currently selected fit.
   def switchFit(newFit: String) : Unit = {
     val sheet = currentSheet.get()
     if (sheet.nonEmpty) {
@@ -41,6 +45,7 @@ class RegressionController {
       )
     }
   }
+  // Switches the color of the current fit.
   def switchColor(color: Color) : Unit = {
     val cFit = currentFit.get
     if (cFit.nonEmpty) {
@@ -58,13 +63,16 @@ class RegressionController {
       }
     }
   }
+  // Adds the given sheet to the sheets and selects it.
   def addSheet(sheet: Sheet) = {
     sheets.addOne(sheet)
     selectSheet(sheet)
   }
+  // Select the given sheet.
   def selectSheet(sheet: Sheet) = {
     currentSheet.value_=(Some(sheet))
   }
+  // Remove the given sheet and switch the current sheet if the removed one was the previously selected one.
   def removeSheet(id: Int) = {
     sheets.remove(sheets.indexWhere(_.id == id))
     if (currentSheet.get().get.id == id) {
@@ -81,4 +89,13 @@ class RegressionController {
   def getSheetIndex(sheet: Sheet) : Int = sheets.indexOf(sheet)
 
   def setAxisEndpoints(endpoints: AxisEndpoints) = axisEndPoints.value_=(endpoints)
+
+  // Show an error dialog displaying the given message.
+  def showError(message: String) = {
+    val alert = new Alert(Alert.AlertType.Error) {
+      title = "Error"
+      contentText = message
+    }
+    alert.show()
+  }
 }
