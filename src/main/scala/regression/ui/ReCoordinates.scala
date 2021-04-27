@@ -10,6 +10,7 @@ import javafx.scene.paint.Paint
 import scalafx.scene.shape.Circle
 import javafx.scene.paint.Color
 import regression.RegressionController
+import scalafx.scene.control._
 
 class ReCoordinates extends Pane{
   val xAxis = new NumberAxis()
@@ -110,10 +111,18 @@ class ReCoordinates extends Pane{
       pointNode.setStrokeWidth(2.5f)
       pointNode.setStyle(s"-fx-stroke: rgba($r, $g, $b);")
       pointNode.setFill(Color.WHITE)
+      pointNode.onMouseClicked = (_) => openDataPointDialog(point, set.keysLabel, set.valuesLabel)
       chartPoint.setNode(pointNode)
       series.getData().add(chartPoint)
     }
     series
+  }
+  private def openDataPointDialog(point: (Double, Double), keysLabel: String, valuesLabel: String) = {
+    val alert = new Alert(Alert.AlertType.None)
+    alert.title_=("Point")
+    alert.setContentText(s"${point._1} $keysLabel \n${point._2} $valuesLabel")
+    alert.buttonTypes.addOne(ButtonType.Close)
+    alert.show()
   }
 
 }
