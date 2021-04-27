@@ -14,7 +14,7 @@ import scalafx.scene.layout.GridPane
 import scalafx.geometry.Insets
 import regression.RegressionController
 
-/// Class for regression menubar.
+// Class for regression menubar.
 class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
 
   val node = new HBox

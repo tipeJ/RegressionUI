@@ -7,11 +7,13 @@ import regression.models.Sheet
 import scalafx.collections.ObservableBuffer
 import regression.RegressionController
 
+// Helper class for TableView.
 class DataCell(key_ : Double, value_ : Double) {
   val k = new ObjectProperty[Double](this, "k", key_)
   val v = new ObjectProperty[Double](this, "v", value_)
 }
 
+// An excel-like UI component for DataCell pairs.
 class ReDataPanel() {
   val table = new TableView[DataCell]()
 

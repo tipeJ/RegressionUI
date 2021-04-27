@@ -90,7 +90,7 @@ object App extends JFXApp {
 
   // Initialize the first sheet id
   var newId = 0
-  /// Loads a sheet from a file
+  // Loads a sheet from a file
   def loadDataFile(f: File) : Unit = {
     if (f != null && f.canRead()) {
       try {

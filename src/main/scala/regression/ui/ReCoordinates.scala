@@ -12,6 +12,7 @@ import javafx.scene.paint.Color
 import regression.RegressionController
 import scalafx.scene.control._
 
+// Class which displays the given dataset in a X-Y 2d coordinate system. Also draws the selected RegressionFit.
 class ReCoordinates extends Pane{
   val xAxis = new NumberAxis()
   val yAxis = new NumberAxis()
@@ -127,6 +128,7 @@ class ReCoordinates extends Pane{
 
 }
 
+// Class for handling selected axis endpoints.
 case class AxisEndpoints (auto: Boolean = false, xStart: Double = 0, xEnd: Double = 1, yStart: Double = 0, yEnd: Double = 1) {
   if (!auto && (xStart >= xEnd || yStart >= yEnd)) throw new IllegalArgumentException("Lower bounds of axes must not be greater than the upper bounds")
 

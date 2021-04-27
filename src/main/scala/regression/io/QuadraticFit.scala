@@ -2,9 +2,10 @@ package regression.io
 
 import scalafx.scene.paint.Color
 
+// Second degree polynomial regression fit (x^2 + x + b).
 class QuadraticFit(private val data : Seq[(Double, Double)], c: Color = Color.AliceBlue) extends RegressionFit(c) {
 
-  /// Calculate the coefficients for the Quadratic Fit with the Least Squares method (https://en.wikipedia.org/wiki/Least_squares)
+  // Calculate the coefficients for the Quadratic Fit with the Least Squares method (https://en.wikipedia.org/wiki/Least_squares)
   private def quadraticFit() : (Double, Double, Double) = {
     val Sx        = data.map(_._1).sum // Sum of x-values from the data map
     val Sy        = data.map(_._2).sum // Sum of y-values from the data map
