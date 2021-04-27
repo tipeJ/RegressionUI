@@ -16,7 +16,7 @@
   The program meets the advanced requirements, with two supported file types (.txt and .json) and two implemented polynomial regression fits (1st and 2nd degree equations).
 
 * User interface
-  The program is started by building the source code.
+  The program is started by building the source code. You can run the program by executing command "sbt run" from the root directory. NOTE: You need java version 55.0 to compile this project (OpenJDK 11)
 
   [[./screenshots/general.png]]
   The UI consists of four different parts:
