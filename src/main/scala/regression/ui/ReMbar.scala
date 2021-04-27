@@ -32,7 +32,13 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
     // Button for loading a new datasheet
     val loadDataButton = new Button("Open file")
     loadDataButton.onAction = (event) => {
-      val fileChooser = new FileChooser()
+      val fileChooser = new FileChooser(){
+        extensionFilters.addAll(
+          new FileChooser.ExtensionFilter("Dataset files (.json or .txt)", Seq("*.txt", "*.json")),
+          new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"),
+          new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"),
+        )
+      }
       fileChooser.setTitle("Open data file")
       val file = fileChooser.showOpenDialog(stage)
       this.loadFileCallback(file)
