@@ -12,14 +12,13 @@ import scalafx.scene.control.TableColumn._
 import scalafx.beans.property._
 import scalafx.beans.value.ObservableValue
 import scalafx.stage.FileChooser
-import regression.ui._
-import java.io.{File, InputStreamReader, FileInputStream, BufferedReader}
-import regression.io._
-import regression.models.Sheet
 import scala.collection.mutable.Buffer
-import regression.io._
 import scalafx.scene.text.Text
+import java.io.{File, InputStreamReader, FileInputStream, BufferedReader}
 import java.io.FileNotFoundException
+import regression.models.Sheet
+import regression.ui._
+import regression.io._
 import regression.RegressionController
 
 object App extends JFXApp {
@@ -35,7 +34,7 @@ object App extends JFXApp {
   val controller = new RegressionController
 
   // Initialize the main UI components:
-  val menuB         = new ReMbar(stage, loadDataFile)
+  val menuB         = new ReMenubar(stage, loadDataFile)
   val tabbar        = new ReTabBar
   val datapanel     = new ReDataPanel
   val equationText  = new Label {

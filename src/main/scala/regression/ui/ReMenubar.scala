@@ -15,7 +15,7 @@ import scalafx.geometry.Insets
 import regression.RegressionController
 
 /// Class for regression menubar.
-class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
+class ReMenubar(val stage: Stage, loadFileCallback: (File) => Unit) {
 
   val node = new HBox
 
@@ -61,7 +61,6 @@ class ReMbar(val stage: Stage, loadFileCallback: (File) => Unit) {
           if (fit.nonEmpty) {
             val alert = new Alert(Alert.AlertType.None)
             alert.title_=("Equation")
-            // alert.setContentText(fit.get.formattedExpression)
             val eqText = new TextArea(fit.get.formattedExpression)
             eqText.editable_=(false)
             eqText.wrapText_=(true)
