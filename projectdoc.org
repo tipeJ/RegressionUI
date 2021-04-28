@@ -1,5 +1,6 @@
 #+AUTHOR: Tiitus Järvinen (793430)
 #+TITLE: Regression visualization project document
+#+LATEX_HEADER: \usepackage{parskip}
 
 * Personal information
 
@@ -16,7 +17,7 @@
   The program meets the advanced requirements, with two supported file types (.txt and .json) and two implemented polynomial regression fits (1st and 2nd degree equations).
 
 * User interface
-  The program is started by building the source code. You can run the program by executing command "sbt run" from the root directory. NOTE: You need java version 55.0 to compile this project (OpenJDK 11)
+  The program is started by building the source code. You can run the program by executing command "sbt run" from the root directory. NOTE: You need java version 55.0 to compile this project (OpenJDK 11).
 
   [[./screenshots/general.png]]
   The UI consists of four different parts:
@@ -34,7 +35,7 @@
    The Open file-button opens a dialog which the user can use to import data to the software.
    The Fit-switch button allows the user to choose which fit they want to use with the data.
    The Show equation-button allows the user to view the equation of the current fit in a selectable text field.
-   The Color switcher allows the user to choose which colour to draw the data points and the fit with.
+   The Color switcher allows the user to choose which colour to draw the data points and the fit with. NOTE: The color is black by default for coordinates without a selected regression fit.
    The Axis endpoints-button allows the user to choose the axis ranges displayed on the coordinates panel. The default "fit into view" option zooms out to show the entire dataset.
 
 ** Tab bar
@@ -73,14 +74,58 @@
 
 ** Linear Regression
    Uses the [[https://en.wikipedia.org/wiki/Least_squares][Least Squares Method]] to create a linear scatter plot. Once the slope is calculated, the coordinates object draws it.
+
+   The core idea is to minimize the sum of squared differences between the polynomial value of the fit and the data points.
+   
+   The method as implemented in the program:
+   #+BEGIN_SRC scala
+    val n = data.length
+    val vX = data.map(_._1).reduce((p, p2) => p + p2)/n // AVG of x-values
+    val vY = data.map(_._2).reduce((p, p2) => p + p2)/n // AVG of y-values
+    var sXX = 0.0 // Sum of x-AVG(x) squared
+    var sXY = 0.0 // Sum of (x-AVG(x))(y-AVG(y))
+    for (p <- data) {
+      sXY += (p._1 - vX) * (p._2 - vY)
+      sXX += math.pow(p._1 - vX, 2)
+    }
+    val m = sXY/sXX
+    val b = vY - m*vX
+   #+END_SRC
+   Where m is the first coefficient and b is the y-intercept of the fit.
    
 ** 2nd Degree regression
    Uses the [[https://en.wikipedia.org/wiki/Least_squares][Least Squares Method]] to create the second degree polynomial fit into the given dataset.
    
+   Again, the idea is to minimize the sum of squared differences between the polynomial value of the fit and the data points. This time the method is more complex. The coefficients are calculated by using [[https://www.purplemath.com/modules/cramers.htm][Cramer's law.]]
+   
+  #+BEGIN_SRC scala
+    val Sx        = data.map(_._1).sum // Sum of x-values from the data map
+    val Sy        = data.map(_._2).sum // Sum of y-values from the data map
+    val Sx4       = data.map(d => math.pow(d._1, 4)).sum // Sum of x^4
+    val Sx3       = data.map(d => math.pow(d._1, 3)).sum // Sum of x^3
+    val Sx2       = data.map(d => math.pow(d._1, 2)).sum // Sum of x^2
+    val Sxy       = data.map(d => d._1 * d._2).sum       // Sum of x
+    val Sx2y      = data.map(d => math.pow(d._1, 2) * d._2).sum // Sum of x^2y
+
+    val n = data.size // Length of the data
+
+    // First coefficient
+    val coef1 = (Sx2y * (Sx2 * n - Sx * Sx) - Sxy * (Sx3 * n - Sx * Sx2) + Sy * (Sx3 * Sx - Sx2 * Sx2)) / (Sx4 * (Sx2 * n - Sx * Sx) - Sx3 * (Sx3 * n - Sx * Sx2) + Sx2 * (Sx3 * Sx - Sx2 * Sx2))
+
+    // Second coefficient
+    val coef2 = (Sx4 * (Sxy * n - Sy * Sx) - Sx3 * (Sx2y * n - Sy * Sx2) + Sx2 * (Sx2y * Sx - Sxy * Sx2)) / (Sx4 * (Sx2 * n - Sx * Sx) - Sx3 * (Sx3 * n - Sx * Sx2) + Sx2 * (Sx3 * Sx - Sx2 * Sx2))
+
+    // Third coefficient
+    val coef3 = (Sx4 * (Sx2 * Sy - Sx * Sxy) - Sx3 * (Sx3 * Sy - Sx * Sx2y) + Sx2 * (Sx3 * Sxy - Sx2 * Sx2y)) / (Sx4 * (Sx2 * n - Sx * Sx) - Sx3 * (Sx3 * n - Sx * Sx2) + Sx2 * (Sx3 * Sx - Sx2 * Sx2))
+
+    (coef1, coef2, coef3)
+  #+END_SRC
 * Data structures
 
   The RegressionController stores the sheets and current fit and axisendpoints into observable values, which the UI components can add listeners to. The sheets are contained within an ObservableList, whereas the singular objects are contained within ObjectProperties.
 
+  The objectproperties are mutable, as is the sheets list.
+  
   The Sheet class includes a Dataset class, which will store the points as a Map object. A map object is the most logical solution for connecting two values to each other. In addition, it ensures that the values can be in whatever order. Also, a map structure ensures that no values have the same key, which is essential for the regression analysis part.
 
   Alternatively, a custom data model could have been used, but it would have no visible benefits to a Map object.
@@ -90,6 +135,8 @@
   The program does not access or require internet in any way.
   
   The program interacts with .txt and .json files. It can open then and parse a set of data points (X-Y) from them. The program does not save the data in any format, nor does it allow for modifying open data in memory, as the purpose of the application is to simply visualize the regression.
+
+  Samples of both file types are included in the "example" folder. The following subsections describe the inner structure of these files in case one wants to create them.
 
 ** Standard (TXT) format
 
@@ -129,6 +176,8 @@
 
   The UI part of the application was tested manually, by selecting various correct and incorrect values in configuration dialogs and other options.
 
+  After adding new features the program's functionality was tested using pre-created working datasets and verifying that the program worked as before.
+
 * Known bugs and missing features
   Bugs:
   - The standard .txt file format is not parsed correctly if there is an empty line at the end of file. Fixing this should be easy if needed later on.
@@ -142,7 +191,7 @@
 * 3 best sides and 3 weaknesses
   
 ** Best sides
-   1. I liked the way I structured the UI with the RegressionController class controlling the UI part of the program. Initially, I had various callback functions passed to the UI components, but now I've minimized those and greatly simplified implementing future features.
+   1. I liked the way I structured the UI with the RegressionController class controlling the UI part of the program. Initially, I had various callback functions passed to the UI components, but now I've minimized those and greatly simplified implementing future features. It also removes a large amount of boilerplate code required by constant callback functions.
    2. I prefer the LineChart as provided by the ScalaFX library to the custom implementation I initially wanted to build. The LineChart animates the changes as well!
    3. I think the way I build the data model for the different regression fits allows for easy expansion in the future if wanted/needed.
 
@@ -157,15 +206,26 @@
   
   As I've created various GUI applications in my free time for years, I didn't learn anything particularly new during this process, other than the ScalaFX/JavaFX side of things.
 
+  Initially I started with building the test cases and the implementation for loading the two file types. This took roughly the first two weeks. The next weeks I spent creating the general UI layout excluding the coordinates system, which I knew would be the hardest one to implement. After the other parts of the UI were finished, I developed the two regression fits, which took about 1 week, and proceeded to create the coordinates system, which took another week. Finally, I restructured the program to work with a UI controller class and observables.
+
+  Overall, the process followed the planned schedule, with slight differences (for example, I didn't intend to redo the UI control part).
   
 * Final evaluation
   I think the final program meets the advanced requirements. The class structure could be improved in certain ways, especially the separation of UI and model logic, and would probably be necessary should the development continue further.
 
-  Overall the class structure is well planned to support making changes or future extensions and adding functionality.
+  Overall the class structure is well planned to support making changes or future extensions and adding functionality. Adding new regression fits is easy, and any expansion of UI would be quick to do with the RegressionController implementation.
 
-  If I started this process from the start again, I would directly abandon my plans for creating a custom canvas coordinates panel and go straight for the components provided by the ScalaFX library.
+  If I started this process from the start again, I would directly abandon my plans for creating a custom canvas coordinates panel and go straight for the components provided by the ScalaFX library. I would also know that the LaGrange functions are not the proper choice for the 2nd degree polynomial fit.
 
 * References
 
   ScalaFX and JavaFX documentation.
   [[https://en.wikipedia.org/wiki/Least_squares][Least Squares Method]] 
+  [[https://www.purplemath.com/modules/cramers.htm][Cramer's law]]
+
+* Appendixes
+  The code can be found within the src folder.
+
+  The example data files are found within the example directory.
+
+  Some screenshots of the UI components can be found within the screenshots folder.

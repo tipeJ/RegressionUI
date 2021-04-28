@@ -1,0 +1,8 @@
+{
+    "data" : {
+        "1.23" : 2.0,
+        "2.5"  : 4.6
+    },
+    "keysLabel" : "t (s)",
+    "valuesLabel" : "x (m)"
+}
